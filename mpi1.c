@@ -16,9 +16,9 @@ void function1(int input, int rank) {
             J+=input*i;
         }
         if(J>best_J[rank]){
-            best_J[rank] = J;
+            //best_J[rank] = J;
             for(int j = 0; j<SIZE_R; j++){
-                best_path[rank][j] = i*j;
+                //best_path[rank][j] = i*j;
             }
         }
         
