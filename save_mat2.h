@@ -36,8 +36,8 @@ int (*save_mat(char path[]))[SIZE_R] {
     }
     // printf("finish while\n");
     fclose(file);
-    free(file);
-    free(line);
+    //free(file);
+    //free(line);
     //printf("elecment in array = %d \n", dist[0][0]);
     //printf("...done... \n");
     // printf("finish save mat\n");
@@ -53,8 +53,8 @@ int save_mat_size(char path[]) {
     fscanf(file, "%d", &number_of_city); 
     fclose(file);
     //printf("...done... \n");
-    free(file);
-    free(line);
+    //free(file);
+    //free(line);
     // printf("finish save size\n");
     return number_of_city;
 }

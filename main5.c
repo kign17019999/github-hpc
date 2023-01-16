@@ -137,7 +137,7 @@ int main() {
 
 
     
-    free(raw_dist);
-    free(dist);
+    //free(raw_dist);
+    //free(dist);
     return 0;
 }
