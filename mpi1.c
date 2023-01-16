@@ -17,7 +17,7 @@ void function1(int input, int rank) {
         }
         if(J>best_J[rank]){
             best_J[rank] = J;
-            for(int j = 0; j<SIZE_R, j++){
+            for(int j = 0; j<SIZE_R; j++){
                 best_path[rank][j] = i*j;
             }
         }
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     }
     
     MPI_Barrier(MPI_COMM_WORLD);
-    
+
     printf("Process %d doing more work...\n", rank);
     if(rank==0){
         for(int i = 0; i < SIZE_R ; i++){
