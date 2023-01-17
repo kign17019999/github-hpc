@@ -17,7 +17,7 @@
 int n;
 int dist[MAX_CITIES][MAX_CITIES];
 int best_path[MAX_CITIES][MAX_CITIES],
-int best_path_cost[MAX_CITIES];
+int best_path_cost[MAX_CITIES] = {INFINITE};
 
 //int (*raw_dist)[MAX_CITIES];
 //int raw_dist[MAX_CITIES][MAX_CITIES];
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     n = save_mat_size(file_path);
 
     //int (*raw_dist)[MAX_CITIES] = save_mat(file_path);
-    int raw_dist[MAX_CITIES][MAX_CITIES] = save_mat(file_path);
+    int (*raw_dist)[MAX_CITIES] = save_mat(file_path);
     
     for (int i = 0; i < n; i++) {
         for (int j = i; j < n; j++) {
@@ -74,9 +74,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    for(int i=0; i<size; i++){
-        best_path_cost[i]=INFINITE;
-    }
+    
     int path[MAX_CITIES];
     int visited[MAX_CITIES] = {0};
     path[0] = 0;
