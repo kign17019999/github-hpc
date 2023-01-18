@@ -17,41 +17,79 @@ void copy_path(int dest[], int src[]) {
 }
 
 void branch_and_bound(int path[], int path_cost, int visited[], int level) {
+    printf("lvl: %d \n", level);
     if (level == n) {
         if (path_cost < best_path_cost) {
             best_path_cost = path_cost;
             copy_path(best_path, path);
             ////////////////////////////////////////////////////////////////////////
-            printf("{END}  END Journy at last level: %d , it will be previouse level (%d) \n", level, level-1);
-            ////////////////////////////////////////////////////////////////////////
-        }
-    } else {
-        for (int i = 0; i < n; i++) {
-                ////////////////////////////////////////////////////////////////////////
-                printf("level: %d \n", level);
-                printf("path: ");
+            printf("                path: ");
                 for (int i = 0; i < n; i++) {
                     printf("%d ", path[i]);
                 }
-                printf("\n");
+            printf("\n {END}  END Journy at last level: %d , it will be previouse level (%d) \n", level, level-1);
+            ////////////////////////////////////////////////////////////////////////
+        }
+    } else {
+        printf("0-visited: ");
+        for (int i = 0; i < n; i++) {
+            printf("%d ", visited[i]);
+        }
+        printf("\n");
+        for (int i = 0; i < n; i++) {
+                ////////////////////////////////////////////////////////////////////////
+                printf("level-X: %d \n", level);
+//                printf("path: ");
+//                for (int i = 0; i < n; i++) {
+//                    printf("%d ", path[i]);
+//                }
+//                printf("\n");
                     
-                printf("visited: ");
+                printf("1-visited {%d}: ", i);
                 for (int i = 0; i < n; i++) {
                     printf("%d ", visited[i]);
                 }
                 printf("\n");
 
-                printf("path_cost: ");
+//                printf("path_cost: ");
+//                for (int i = 0; i < n; i++) {
+//                    printf("%d ", visited[i]);
+//                }
+//                printf("\n");
+                ////////////////////////////////////////////////////////////////////////
+//            printf("@@@-0 visited[i]= %d \n",visited[i]);
+            if (!visited[i]) {
+                printf("level: %d | i: %d \n", level, i);
+
+                ////////////////////////////////////////////////////////////////////////
+                printf("  [before]   path: ");
+                for (int i = 0; i < n; i++) {
+                    printf("%d ", path[i]);
+                }
+                printf("\n");
+
+                printf("  [before]   visited: ");
                 for (int i = 0; i < n; i++) {
                     printf("%d ", visited[i]);
                 }
-                printf("\n");
+                printf("\n");                
                 ////////////////////////////////////////////////////////////////////////
-            printf("@@@-0 visited[i]= %d \n",visited[i]);
-            if (!visited[i]) {
                 path[level] = i;
                 visited[i] = 1;
                 int new_cost = path_cost + dist[path[level - 1]][i];
+
+                printf("level: %d \n", level);
+                printf("  [after]   path: ");
+                for (int i = 0; i < n; i++) {
+                    printf("%d ", path[i]);
+                }
+                printf("\n");
+
+                printf("  [after]   visited: ");
+                for (int i = 0; i < n; i++) {
+                    printf("%d ", visited[i]);
+                }
+                printf("\n");        
                 ////////////////////////////////////////////////////////////////////////
                 printf("{%d} new_cost: %d | best cost: %d \n", i, new_cost, best_path_cost);
                 ////////////////////////////////////////////////////////////////////////
@@ -65,9 +103,18 @@ void branch_and_bound(int path[], int path_cost, int visited[], int level) {
                     printf("!!! {%d} cost not good \n", i);
                 }
                 printf("<<< {%d} heading back from %d to %d\n", i, level, level-1);
-                printf("@@@-1 visited[i]= %d \n",visited[i]);
+                printf("  [before@]   visited: ");
+                for (int i = 0; i < n; i++) {
+                    printf("%d ", visited[i]);
+                }
+                printf("\n");  
                 ////////////////////////////////////////////////////////////////////////
                 visited[i] = 0;
+                printf("  [after@]   visited: ");
+                for (int i = 0; i < n; i++) {
+                    printf("%d ", visited[i]);
+                }
+                printf("\n"); 
             }
         }
     }
