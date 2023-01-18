@@ -46,14 +46,15 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     char* check_i = argv[1];
+    char* file_path;
     if(check_i == "-i"){
         char* myArg = argv[2];
         while (myArg[0] == '\'') myArg++;
         while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
         printf("Argument: %s\n", myArg);
-        char* file_path = myArg;
+        file_path = myArg;
     }else{
-        char* file_path  = "input/dist4";
+        file_path  = "input/dist4";
     }
     
     n = save_mat_size(file_path);
