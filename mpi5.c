@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
         printf("Argument: %s\n", myArg);
         char* file_path = myArg;
     }else{
-        char char* file_path  = "input/dist4";
+        char* file_path  = "input/dist4";
     }
     
     n = save_mat_size(file_path);
