@@ -37,8 +37,29 @@ void branch_and_bound(int path[], int path_cost, int visited[], int level) {
     }
 }
 
-int main() {
-    char file_path[] = "input/dist4";
+int main(int argc, char *argv[]) {
+    printf("Number of command line arguments: %d\n", argc);
+    printf("Hi-1 %s\n", argv[1]);
+    char* myArg = argv[1];
+    // while(1){
+    //     if(myArg[0] == '\''){
+    //         myArg++;
+    //     }else{
+    //         break;
+    //     }
+    // }
+    // while(1){
+    //     if(myArg[strlen(myArg)-1] == '\''){
+    //         myArg[strlen(myArg)-1] = '\0';
+    //     }else{
+    //         break;
+    //     }
+    // }
+    while (myArg[0] == '\'') myArg++;
+    while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
+    printf("Argument: %s\n", myArg);
+    char* file_path = myArg;
+    //char file_path[] = "input/dist4";
     n = save_mat_size(file_path);
     int (*raw_dist)[MAX_CITIES] = save_mat(file_path);
     printf("------------------- \n");
