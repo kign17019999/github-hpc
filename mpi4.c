@@ -161,11 +161,9 @@ int main(int argc, char *argv[]) {
     }
 
     printf("best of the best is in rank %d, \n", index_best_path);
-	for(int i = 0; i < n ; i++){
-        printf("  best_path: ");
-        for(int j = 0 ; j < n ; j++){
-            printf("%d ", best_path[index_best_path][i]);
-        }
+	printf("  best_path: ");
+    for(int i = 0; i < n ; i++){
+        printf("%d ", best_path[index_best_path][i]);
     }
     printf("\n  best_path_cost: %d \n", best_path_cost[index_best_path]);
    }
