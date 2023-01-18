@@ -132,10 +132,12 @@ int main(int argc, char *argv[]) {
     int send_buf_cost = best_path_cost[rank];
     MPI_Allgather(&send_buf_cost, 1, MPI_INT, best_path_cost, 1, MPI_INT, MPI_COMM_WORLD);
 
-    for(int i=0; i<MAX_CITIES; i++){
-        int send_buf_path = best_path[rank][i];
-        MPI_Allgather(&send_buf_path, 1, MPI_INT, best_path, 1, MPI_INT, MPI_COMM_WORLD);
+    int row_to_gather[MAX_CITIES];
+    for (int i = 0; i < MAX_CITIES; i++) {
+        row_to_gather[i] = best_path[rank][i];
     }
+
+    MPI_Allgather(row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
 
     MPI_Barrier(MPI_COMM_WORLD);
 
@@ -144,11 +146,28 @@ int main(int argc, char *argv[]) {
 	for(int i = 0; i < size ; i++){
             printf("processor %d: \n", i);
             printf("  path: ");
-            for(int j = 0 ; j < MAX_CITIES ; j++){
+            for(int j = 0 ; j < n ; j++){
                 printf("%d ", best_path[i][j]);
             }
            printf("\n  best_path_cost: %d \n", best_path_cost[i]);
         }
+
+    int min_dist=INFINITE;
+    int index_best_path;
+    for(int i=0; i<n; i++){
+        if(best_path_cost[i]<min_dist){
+            index_best_path = i;
+        }
+    }
+
+    printf("best of the best is in rank %d, \n", index_best_path);
+	for(int i = 0; i < n ; i++){
+        printf("  best_path: ");
+        for(int j = 0 ; j < n ; j++){
+            printf("%d ", best_path[index_best_path][i]);
+        }
+    }
+    printf("\n  best_path_cost: %d \n", best_path_cost[index_best_path]);
    }
 
     MPI_Finalize();
