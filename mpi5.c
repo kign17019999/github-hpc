@@ -43,19 +43,21 @@ void branch_and_bound(int path[], int path_cost, int visited[], int level, int r
 int main(int argc, char *argv[]) {
     int rank, size;
     MPI_Init(&argc, &argv);
+
+    double start_time = MPI_Wtime();
+
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    char* check_i = argv[1];
     char* file_path;
-    if(check_i == "-i"){
+    if(argc >=3 && strcmp("-i", argv[1]) == 0){
         char* myArg = argv[2];
         while (myArg[0] == '\'') myArg++;
         while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
-        printf("Argument: %s\n", myArg);
         file_path = myArg;
     }else{
         file_path  = "input/dist4";
     }
+
     
     n = save_mat_size(file_path);
     if(rank==0) printf("n= %d \n", n);
@@ -142,6 +144,14 @@ int main(int argc, char *argv[]) {
     }
     printf("\n  best_path_cost: %d \n", best_path_cost[index_best_path]);
    }
+
+    double end_time = MPI_Wtime();
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    double elapsed_time = end_time - start_time;
+    printf("rank=%d spent: %f seconds\n", rank, elapsed_time);
+
 
     MPI_Finalize();
     return 0;
