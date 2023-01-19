@@ -10,8 +10,8 @@
 
 int n;
 int (*dist)[MAX_CITIES];
-int *best_path;
-int best_path_cost = INFINITE;
+int (*best_path)[MAX_CITIES];
+int *best_path_cost;
 
 
 int get_cities_info(char* file_path);
@@ -48,7 +48,8 @@ int main(int argc, char *argv[]) {
 
     for(int i=0; i<MAX_CITIES; i++){
         best_path_cost[i]=INFINITE;
-    }   
+    }
+       
     int *path = malloc(MAX_CITIES * sizeof(int));
     int *visited = malloc(MAX_CITIES * sizeof(int));
     for(int i=0; i<MAX_CITIES; i++) visited[i]=0;
