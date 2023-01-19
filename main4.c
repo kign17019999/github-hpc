@@ -53,7 +53,7 @@ void branch_and_bound(int path[], int path_cost, int visited[], int level) {
 
 int main() {
     printf(">>>start 1 \n");
-    char file_path[] = "input/dist17";
+    char file_path[] = "input/dist6";
     n = save_mat_size(file_path);
     int (*raw_dist)[MAX_CITIES] = save_mat(file_path);
     printf(">>>finish read array from file \n");

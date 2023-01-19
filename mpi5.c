@@ -134,6 +134,7 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<n; i++){
         if(best_path_cost[i]<min_dist){
             index_best_path = i;
+            min_dist = best_path_cost[i];
         }
     }
 
