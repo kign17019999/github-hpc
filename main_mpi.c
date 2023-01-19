@@ -6,18 +6,16 @@
 
 #define MAX_CITIES 20
 #define INFINITE INT_MAX
-#define SIZE_R 20
+#define START_CITIES 0
 
-int n;
-int dist[MAX_CITIES][MAX_CITIES];
-int best_path[MAX_CITIES][MAX_CITIES];
-int best_path_cost[MAX_CITIES];
+int *n;
+int (*dist)[MAX_CITIES];
+int *best_path;
+int *best_path_cost = INFINITE;
 
 
-int (*save_mat(char* path))[SIZE_R];
-int save_mat_size(char* path);
-void branch_and_bound(int path[], int path_cost, int visited[], int level, int rank);
-void copy_path(int current_path[], int rank);
+int get_cities_info(char* file_path);
+void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
 
 
 int main(int argc, char *argv[]) {
@@ -28,6 +26,10 @@ int main(int argc, char *argv[]) {
 
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    dist = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
+    best_path = malloc(sizeof(int[MAX_CITIES]));
+
     char* file_path;
     if(argc >=3 && strcmp("-i", argv[1]) == 0){
         char* myArg = argv[2];
@@ -35,37 +37,27 @@ int main(int argc, char *argv[]) {
         while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
         file_path = myArg;
     }else{
-        file_path  = "input/dist4";
+        char *df_file = "input/dist4";
+        printf("[System] The default file (%s) will be used if no input is provided  \n", df_file);
+        file_path  = df_file;
     }
 
-    
-    n = save_mat_size(file_path);
+    get_cities_info(file_path);
+
     if(rank==0) printf("n= %d \n", n);
-    int (*raw_dist)[MAX_CITIES] = save_mat(file_path);
-    
-    for (int i = 0; i < n; i++) {
-        for (int j = i; j < n; j++) {
-            if (i==j){
-                dist[i][j] = 0;
-            }else if(i==n-1 && j==n-1){
-                dist[i][j] = 0;
-            }
-            else{
-                dist[i][j] = raw_dist[j-1][i];
-                dist[j][i] = dist[i][j];
-            }
-        }
-    }    
-
-
 
     for(int i=0; i<MAX_CITIES; i++){
         best_path_cost[i]=INFINITE;
     }   
-    int path[MAX_CITIES];
-    int visited[MAX_CITIES] = {0};
-    path[0] = 0;
-    visited[0] = 1;
+    int *path = malloc(MAX_CITIES * sizeof(int));
+    int *visited = malloc(MAX_CITIES * sizeof(int));
+    for(int i=0; i<MAX_CITIES; i++) visited[i]=0;
+
+    // set starter city to city 1 (or 0 in array order) in path array at position 0
+    path[0] = START_CITIES;
+
+    // set visited city to 1 by setting visited array position 0 to 1
+    visited[START_CITIES] = 1;
     
     int second_city;
     int num_procs_cities;
@@ -86,13 +78,12 @@ int main(int argc, char *argv[]) {
     for(int i = second_city ; i < second_city+num_procs_cities; i++){
         path[1] = i;
         for(int i=1; i<MAX_CITIES; i++){
-	    visited[i]=0;
-	}
-	visited[i] = 1;
+	        visited[i]=0;
+	    }
+	    visited[i] = 1;
         current_cost = dist[path[0]][path[1]];
-	branch_and_bound(path, current_cost, visited, 2, rank);
+	    branch_and_bound(path, current_cost, visited, 2, rank);
     }
-
 
     MPI_Barrier(MPI_COMM_WORLD);
     
@@ -138,18 +129,17 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-int (*save_mat(char* path))[SIZE_R] {
-    FILE* file = fopen(path, "r");
+int get_cities_info(char* file_path) {
+    FILE* file = fopen(file_path, "r");
     
-    int number_of_city = 0;
+    //int number_of_city = 0;
     char line[256];
-    fscanf(file, "%d", &number_of_city); 
+    fscanf(file, "%d", &n); 
 
-    int row=0;
+    int row=1;
     int col=0;
 
-    int (*dist)[SIZE_R] = malloc(sizeof(int[SIZE_R][SIZE_R]));
-
+    dist[row-1][col]=0;
 
     while (fgets(line, sizeof(line), file)) {
         col=0;
@@ -157,51 +147,34 @@ int (*save_mat(char* path))[SIZE_R] {
         while (token != NULL) {
             if(atoi(token)>0){
                 dist[row-1][col] = atoi(token);
+                dist[col][row-1] = atoi(token);
             }
             token = strtok(NULL, " ");
             col++;
         }
+        dist[row][col]=0;
         row++;
     }
     fclose(file);
-    return dist;
 }
 
-int save_mat_size(char* path) {
-    FILE* file = fopen(path, "r");
-    char line[256];
-    int row = 0;
-    int number_of_city = 0;
-    int col=0;
-    fscanf(file, "%d", &number_of_city); 
-    fclose(file);
-    return number_of_city;
-}
-
-
-void copy_path(int current_path[], int rank) {
-    for (int i = 0; i < n; i++) {
-        best_path[rank][i] = current_path[i];
-    }
-}
-
-void branch_and_bound(int path[], int path_cost, int visited[], int level, int rank) {
+void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank) {
     if (level == n) {
 	if (path_cost < best_path_cost[rank]) {
             best_path_cost[rank] = path_cost;
-            copy_path(path, rank);
+            for (int i = 0; i < n; i++) best_path[rank][i] = path[i];
         }
     } else {
         for (int i = 0; i < n; i++) {
-	    if (!visited[i]) {
-                path[level] = i;
-                visited[i] = 1;
-                int new_cost = path_cost + dist[path[level - 1]][i];
-		if (new_cost < best_path_cost[rank]) {
-                    branch_and_bound(path, new_cost, visited, level + 1, rank);
-                }
-                visited[i] = 0;
-	    }
+            if (!visited[i]) {
+                    path[level] = i;
+                    visited[i] = 1;
+                    int new_cost = path_cost + dist[i][path[level - 1]];
+            if (new_cost < best_path_cost[rank]) {
+                        branch_and_bound(path, new_cost, visited, level + 1, rank);
+                    }
+                    visited[i] = 0;
+	        }
         }
     }
 }
