@@ -2,15 +2,17 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <time.h>
+#include <string.h>
 
 #define MAX_CITIES 20
 #define INFINITE INT_MAX
 #define START_CITIES 0
 
-int *n;
+int n;
 int (*dist)[MAX_CITIES];
 int *best_path;
-int *best_path_cost = INFINITE;
+int best_path_cost = INFINITE;
+
 
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level);

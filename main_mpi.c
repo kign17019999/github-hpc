@@ -8,10 +8,10 @@
 #define INFINITE INT_MAX
 #define START_CITIES 0
 
-int *n;
+int n;
 int (*dist)[MAX_CITIES];
 int *best_path;
-int *best_path_cost = INFINITE;
+int best_path_cost = INFINITE;
 
 
 int get_cities_info(char* file_path);
