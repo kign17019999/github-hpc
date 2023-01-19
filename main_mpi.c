@@ -14,8 +14,8 @@ int best_path[MAX_CITIES][MAX_CITIES];
 int best_path_cost[MAX_CITIES];
 
 
-int (*save_mat(char* path))[SIZE_R]
-int save_mat_size(char* path)
+int (*save_mat(char* path))[SIZE_R];
+int save_mat_size(char* path);
 void branch_and_bound(int path[], int path_cost, int visited[], int level, int rank);
 void copy_path(int current_path[], int rank);
 
