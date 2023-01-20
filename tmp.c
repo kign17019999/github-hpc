@@ -8,14 +8,11 @@
 #define MAX_CITIES 20
 #define INFINITE INT_MAX
 #define START_CITIES 0
-#define ROOT 0
 
 int n;
 int (*dist)[MAX_CITIES];
 int (*best_path)[MAX_CITIES];
 int *best_path_cost;
-
-int (*result)[2];
 
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
@@ -26,7 +23,7 @@ int main(int argc, char *argv[]) {
     int rank, size;
     MPI_Init(&argc, &argv);
 
-    double start_time1 = MPI_Wtime();
+    double start_time = MPI_Wtime();
 
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -43,24 +40,22 @@ int main(int argc, char *argv[]) {
         file_path = myArg;
     }else{
         char *df_file = "input/dist4";
-        if (rank==ROOT) printf("[System] The default file (%s) will be used if no input is provided  \n", df_file);
+        printf("[System] The default file (%s) will be used if no input is provided  \n", df_file);
         file_path  = df_file;
     }
-    
-    if(rank==ROOT){
+
+    if(rank==0){
         get_cities_info(file_path);
         printf("n= %d \n", n);
 
         // Broadcast the array from the root processor
-        MPI_Bcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD);
-        MPI_Bcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD);
+        MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&dist, MAX_CITIES*MAX_CITIES, MPI_INT, 0, MPI_COMM_WORLD);
     }else {
         // Receive the array on all other processors
-        MPI_Bcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD);
-        MPI_Bcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD);
+        MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&dist, MAX_CITIES*MAX_CITIES, MPI_INT, 0, MPI_COMM_WORLD);
     }
-
-    double start_time2 = MPI_Wtime();
 
     for(int i=0; i<MAX_CITIES; i++){
         best_path_cost[i]=INFINITE;
@@ -102,8 +97,6 @@ int main(int argc, char *argv[]) {
 	    branch_and_bound(path, current_cost, visited, 2, rank);
     }
 
-    double end_time2 = MPI_Wtime();
-
     MPI_Barrier(MPI_COMM_WORLD);
     
     int send_buf_cost = best_path_cost[rank];
@@ -118,54 +111,36 @@ int main(int argc, char *argv[]) {
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    if(rank==ROOT){
-        int min_dist=INFINITE;
-        int index_best_path;
-        for(int i=0; i<n; i++){
-            if(best_path_cost[i]<min_dist){
-                index_best_path = i;
-                min_dist = best_path_cost[i];
-            }
+    if(rank==0){
+    int min_dist=INFINITE;
+    int index_best_path;
+    for(int i=0; i<n; i++){
+        if(best_path_cost[i]<min_dist){
+            index_best_path = i;
+            min_dist = best_path_cost[i];
         }
+    }
 
-        printf("best of the best is in rank %d, \n", index_best_path);
-        printf("  best_path: ");
-        for(int i = 0; i < n ; i++){
-            printf("%d ", best_path[index_best_path][i]);
-        }
-        printf("\n  best_path_cost: %d \n", best_path_cost[index_best_path]);
+    printf("best of the best is in rank %d, \n", index_best_path);
+	printf("  best_path: ");
+    for(int i = 0; i < n ; i++){
+        printf("%d ", best_path[index_best_path][i]);
+    }
+    printf("\n  best_path_cost: %d \n", best_path_cost[index_best_path]);
    }
 
-    double end_time1 = MPI_Wtime();
+    double end_time = MPI_Wtime();
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    double total_computing_time = end_time1 - start_time1;
-    double BaB_computing_time = end_time2 - start_time2;
-    if (rank ==ROOT){
-        printf("rank=%d spent: %f seconds\n", rank, computing_time);
-    }
-    
-    result = malloc(sizeof(int[size][2]));
-    result[rank][0] = total_computing_time;
-    result[rank][1] = BaB_computing_time;
-    
-    int row_to_gather[2];
-    for (int i = 0; i < 2; i++) {
-        row_to_gather[i] = result[rank][i];
-    }
+    double computing_time = end_time - start_time;
+    printf("rank=%d spent: %f seconds\n", rank, computing_time);
 
-    MPI_Allgather(row_to_gather, 2, MPI_DOUBLE_PRECISION , result, 2, MPI_DOUBLE_PRECISION , MPI_COMM_WORLD);
 
-    if(rank==ROOT){
-        double index_time = MPI_Wtime();
-        for(int i=0; i<rank;i++){
-            save_result(index_time, i, file_path, result[i][0], result[i][1]);
-        }
-        
-    }
-    
     MPI_Finalize();
+
+    //save_result(file_path, computing_time);
+
     return 0;
 }
 
@@ -219,7 +194,7 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
     }
 }
 
-int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double BaB_computing_time) {
+int save_result(int rank, char *dist_file, double computing_time) {
     FILE *file;
     char date[20];
     time_t t = time(NULL);
@@ -229,7 +204,7 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
     file = fopen(fileName, "r"); // open the file in "read" mode
     if (file == NULL) {
         file = fopen(fileName, "w"); //create new file in "write" mode
-        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), BaB_computing_time (s)\n"); // add header to the file
+        fprintf(file, "date-time, dist file, computing time (s)\n"); // add header to the file
     } else {
         fclose(file);
         file = fopen(fileName, "a"); // open the file in "append" mode
@@ -237,7 +212,7 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
 
     // Get the current date and time
     strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", &tm);
-    fprintf(file, "%f, %d, %s,%s,%f, %f\n", index_time, rank, date, dist_file, total_computing_time, BaB_computing_time); // add new data to the file
+    fprintf(file, "%s,%s,%f\n", date, dist_file, computing_time); // add new data to the file
 
     fclose(file); // close the file
     return 0;
