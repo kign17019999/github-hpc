@@ -16,6 +16,7 @@ int best_path_cost = INFINITE;
 
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level);
+int save_result(char* dist_file, double computing_time);
 
 int main(int argc, char *argv[]) {
     time_t start = time(NULL);
@@ -124,7 +125,7 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level) {
     }
 }
 
-int save_result(char *dist_file, double computing_time) {
+int save_result(char* dist_file, double computing_time) {
     FILE *file;
     char date[20];
     time_t t = time(NULL);
