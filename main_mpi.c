@@ -143,7 +143,8 @@ int main(int argc, char *argv[]) {
     double total_computing_time = end_time1 - start_time1;
     double BaB_computing_time = end_time2 - start_time2;
     if (rank ==ROOT){
-        printf("rank=%d spent: %f seconds\n", rank, computing_time);
+        printf("rank=%d spent total : %f seconds\n", rank, total_computing_time);
+        printf("rank=%d spent BaB   : %f seconds\n", rank, BaB_computing_time);
     }
     
     result = malloc(sizeof(int[size][2]));
