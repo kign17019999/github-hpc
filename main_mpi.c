@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 #include <mpi.h>
 
 #define MAX_CITIES 20
@@ -15,12 +16,12 @@ int (*dist)[MAX_CITIES];
 int (*best_path)[MAX_CITIES];
 int *best_path_cost;
 
-double (*result)[2];
+double (*result)[5];
+double count_bb=0;
 
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
 int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double BaB_computing_time);
-
 
 int main(int argc, char *argv[]) {
     int rank, size;
@@ -147,21 +148,28 @@ int main(int argc, char *argv[]) {
         printf("rank=%d spent BaB   : %f seconds\n", rank, BaB_computing_time);
     }
     
-    result = malloc(sizeof(double[size][2]));
+    result = malloc(sizeof(double[size][5]));
     result[rank][0] = total_computing_time;
     result[rank][1] = BaB_computing_time;
+    result[rank][2] = count_bb;
+    result[rank][3] = best_path_cost[rank];
+    double double_path = pow(10, 2*n)*404;
+    for(int i=0; i<n; i++){
+        double_path+=pow(10, (n-i-1)*2)*best_path[rank][i];
+    }
+    result[rank][4] = double_path;
     
     double row_to_gather_result[2];
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 5; i++) {
         row_to_gather_result[i] = result[rank][i];
     }
 
-    MPI_Allgather(row_to_gather_result, 2, MPI_DOUBLE  , result, 2, MPI_DOUBLE  , MPI_COMM_WORLD);
+    MPI_Allgather(row_to_gather_result, 3, MPI_DOUBLE  , result, 3, MPI_DOUBLE  , MPI_COMM_WORLD);
 
     if(rank==ROOT){
         double index_time = MPI_Wtime();
         for(int i=0; i<size;i++){
-            save_result(index_time, i, file_path, result[i][0], result[i][1]);
+            save_result(index_time, i, file_path, result[i][0], result[i][1], result[i][2], result[i][3], result[i][4]);
         }
         
     }
@@ -200,6 +208,7 @@ int get_cities_info(char* file_path) {
 }
 
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank) {
+    count_bb+=1;
     if (level == n) {
 	if (path_cost < best_path_cost[rank]) {
             best_path_cost[rank] = path_cost;
@@ -220,17 +229,17 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
     }
 }
 
-int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double BaB_computing_time) {
+int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double BaB_computing_time, double count_bab, double r_best_cost, double r_best_path) {
     FILE *file;
     char date[20];
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
-    char* fileName="result_serial.csv";
+    char* fileName="result_parallel.csv";
     file = fopen(fileName, "r"); // open the file in "read" mode
     if (file == NULL) {
         file = fopen(fileName, "w"); //create new file in "write" mode
-        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), BaB_computing_time (s)\n"); // add header to the file
+        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), BaB_computing_time (s), count_BaB, best_cost, best_path\n"); // add header to the file
     } else {
         fclose(file);
         file = fopen(fileName, "a"); // open the file in "append" mode
@@ -238,7 +247,7 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
 
     // Get the current date and time
     strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", &tm);
-    fprintf(file, "%f, %d, %s,%s,%f, %f\n", index_time, rank, date, dist_file, total_computing_time, BaB_computing_time); // add new data to the file
+    fprintf(file, "%f, %d, %s,%s,%f, %f, %f, %f, %f\n", index_time, rank, date, dist_file, total_computing_time, BaB_computing_time, count_bab, r_best_cost, r_best_path); // add new data to the file
 
     fclose(file); // close the file
     return 0;
