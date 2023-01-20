@@ -31,7 +31,7 @@ double count_bb=0;
 
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
-int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double count_bab, double r_best_cost, double r_best_path);
+int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
 double power(double base, int exponent);
 
 int main(int argc, char *argv[]) {
