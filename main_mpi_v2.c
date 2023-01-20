@@ -21,7 +21,8 @@ int (*dist)[MAX_CITIES];
 int (*best_path)[MAX_CITIES];
 int *best_path_cost;
 
-double (*result)[6];
+int num_result = 6;
+double (*result)[num_result];
 double count_bb=0;
 
 int get_cities_info(char* file_path);
@@ -212,7 +213,7 @@ int main(int argc, char *argv[]) {
         printf("rank=%d spent BaB   : %f seconds\n", rank, BaB_computing_time);
     }
     
-    result = malloc(sizeof(double[size][5]));
+    result = malloc(sizeof(double[size][num_result]));
     result[rank][0] = total_computing_time;
     result[rank][1] = sending_time;
     result[rank][2] = BaB_computing_time;
@@ -222,14 +223,14 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<n; i++){
         double_path+=power(10, (n-i-1)*2)*best_path[rank][i];
     }
-    result[rank][5] = double_path;
+    result[rank][num_result] = double_path;
     
-    double row_to_gather_result[6];
-    for (int i = 0; i < 6; i++) {
+    double row_to_gather_result[num_result];
+    for (int i = 0; i < num_result; i++) {
         row_to_gather_result[i] = result[rank][i];
     }
 
-    MPI_Allgather(row_to_gather_result, 6, MPI_DOUBLE  , result, 6, MPI_DOUBLE  , MPI_COMM_WORLD);
+    MPI_Allgather(row_to_gather_result, num_result, MPI_DOUBLE  , result, num_result, MPI_DOUBLE  , MPI_COMM_WORLD);
 
     if(rank==ROOT){
         double index_time = MPI_Wtime();
