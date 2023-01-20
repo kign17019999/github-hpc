@@ -187,13 +187,13 @@ int main(int argc, char *argv[]) {
 
     if(mode_gather==0){
         // mode_gather 0 = gather by Allgather
-        printf("[ROOT] mode_gather = 0 (gather by Allgather) \n");
+        if(rank==ROOT) printf("[ROOT] mode_gather = 0 (gather by Allgather) \n");
         MPI_Allgather(&send_buf_cost, 1, MPI_INT, best_path_cost, 1, MPI_INT, MPI_COMM_WORLD);
         MPI_Allgather(&row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
     }else if(mode_gather==1){
         // mode_gather 1 = gather by Send & Recv
-        printf("[ROOT] mode_gather = 1 (gather by Send & Recv) \n");
         if(rank==ROOT){
+            printf("[ROOT] mode_gather = 1 (gather by Send & Recv) \n");
             for(int i=1; i<size; i++){
                 MPI_Recv(&best_path_cost[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             }
@@ -347,7 +347,7 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
 
     // Get the current date and time
     strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", &tm);
-    fprintf(file, "%f, %d, %s, %s, %f, %f, %f, %f, %f, %f, %f, %d\n", index_time, rank, date, dist_file, total_computing_time, sending_time, BaB_computing_time, gathering_time, count_bab, r_best_cost, r_best_path, mode_send, mode_gather); // add new data to the file
+    fprintf(file, "%f, %d, %s, %s, %f, %f, %f, %f, %f, %f, %f, %d, %d\n", index_time, rank, date, dist_file, total_computing_time, sending_time, BaB_computing_time, gathering_time, count_bab, r_best_cost, r_best_path, mode_send, mode_gather); // add new data to the file
 
     fclose(file); // close the file
     return 0;
