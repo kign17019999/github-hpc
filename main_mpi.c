@@ -28,7 +28,8 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     dist = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
-    best_path = malloc(sizeof(int[MAX_CITIES]));
+    best_path = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
+    best_path_cost = malloc(sizeof(int[MAX_CITIES]));
 
     char* file_path;
     if(argc >=3 && strcmp("-i", argv[1]) == 0){
@@ -49,7 +50,7 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<MAX_CITIES; i++){
         best_path_cost[i]=INFINITE;
     }
-       
+
     int *path = malloc(MAX_CITIES * sizeof(int));
     int *visited = malloc(MAX_CITIES * sizeof(int));
     for(int i=0; i<MAX_CITIES; i++) visited[i]=0;
