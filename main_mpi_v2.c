@@ -21,7 +21,7 @@ int (*dist)[MAX_CITIES];
 int (*best_path)[MAX_CITIES];
 int *best_path_cost;
 
-double (*result)[5];
+double (*result)[6];
 double count_bb=0;
 
 int get_cities_info(char* file_path);
@@ -55,10 +55,14 @@ int main(int argc, char *argv[]) {
         file_path  = df_file;
     }
     
+
     if(rank==ROOT){
         get_cities_info(file_path);
         printf("n= %d \n", n);
+    }
 
+    double start_time2 = MPI_Wtime();
+    if(rank==ROOT){
         if(mode==0){
             // mode 0 = send Dist by Bcast
             MPI_Bcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD);
@@ -116,8 +120,9 @@ int main(int argc, char *argv[]) {
 
         }
     }
+    double end_time2 = MPI_Wtime();
 
-    double start_time2 = MPI_Wtime();
+    double start_time3 = MPI_Wtime();
 
     for(int i=0; i<MAX_CITIES; i++){
         best_path_cost[i]=INFINITE;
@@ -159,7 +164,7 @@ int main(int argc, char *argv[]) {
 	    branch_and_bound(path, current_cost, visited, 2, rank);
     }
 
-    double end_time2 = MPI_Wtime();
+    double end_time3 = MPI_Wtime();
 
     MPI_Barrier(MPI_COMM_WORLD);
     
@@ -199,34 +204,37 @@ int main(int argc, char *argv[]) {
     MPI_Barrier(MPI_COMM_WORLD);
 
     double total_computing_time = end_time1 - start_time1;
-    double BaB_computing_time = end_time2 - start_time2;
+    double sending_time = end_time2 - start_time2;
+    double BaB_computing_time = end_time3 - start_time3;
     if (rank ==ROOT){
         printf("rank=%d spent total : %f seconds\n", rank, total_computing_time);
+        printf("rank=%d spent Send  : %f seconds\n", rank, sending_time);
         printf("rank=%d spent BaB   : %f seconds\n", rank, BaB_computing_time);
     }
     
     result = malloc(sizeof(double[size][5]));
     result[rank][0] = total_computing_time;
-    result[rank][1] = BaB_computing_time;
-    result[rank][2] = count_bb;
-    result[rank][3] = best_path_cost[rank];
+    result[rank][1] = sending_time;
+    result[rank][2] = BaB_computing_time;
+    result[rank][3] = count_bb;
+    result[rank][4] = best_path_cost[rank];
     double double_path = power(10, 2*n)*404;
     for(int i=0; i<n; i++){
         double_path+=power(10, (n-i-1)*2)*best_path[rank][i];
     }
-    result[rank][4] = double_path;
+    result[rank][5] = double_path;
     
-    double row_to_gather_result[5];
-    for (int i = 0; i < 5; i++) {
+    double row_to_gather_result[6];
+    for (int i = 0; i < 6; i++) {
         row_to_gather_result[i] = result[rank][i];
     }
 
-    MPI_Allgather(row_to_gather_result, 5, MPI_DOUBLE  , result, 5, MPI_DOUBLE  , MPI_COMM_WORLD);
+    MPI_Allgather(row_to_gather_result, 6, MPI_DOUBLE  , result, 6, MPI_DOUBLE  , MPI_COMM_WORLD);
 
     if(rank==ROOT){
         double index_time = MPI_Wtime();
         for(int i=0; i<size;i++){
-            save_result(index_time, i, file_path, result[i][0], result[i][1], result[i][2], result[i][3], result[i][4]);
+            save_result(index_time, i, file_path, result[i][0], result[i][1], result[i][2], result[i][3], result[i][4], result[i][5]);
         }
         
     }
@@ -286,7 +294,7 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
     }
 }
 
-int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double BaB_computing_time, double count_bab, double r_best_cost, double r_best_path) {
+int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double count_bab, double r_best_cost, double r_best_path) {
     FILE *file;
     char date[20];
     time_t t = time(NULL);
@@ -296,7 +304,7 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
     file = fopen(fileName, "r"); // open the file in "read" mode
     if (file == NULL) {
         file = fopen(fileName, "w"); //create new file in "write" mode
-        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), BaB_computing_time (s), count_BaB, best_cost, best_path\n"); // add header to the file
+        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), BaB_computing_time (s), count_BaB, best_cost, best_path, mode\n"); // add header to the file
     } else {
         fclose(file);
         file = fopen(fileName, "a"); // open the file in "append" mode
@@ -304,7 +312,7 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
 
     // Get the current date and time
     strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", &tm);
-    fprintf(file, "%f, %d, %s,%s,%f, %f, %f, %f, %f\n", index_time, rank, date, dist_file, total_computing_time, BaB_computing_time, count_bab, r_best_cost, r_best_path); // add new data to the file
+    fprintf(file, "%f, %d, %s,%s,%f, %f, %f, %f, %f, %f, %d\n", index_time, rank, date, dist_file, total_computing_time, sending_time, BaB_computing_time, count_bab, r_best_cost, r_best_path, mode); // add new data to the file
 
     fclose(file); // close the file
     return 0;
