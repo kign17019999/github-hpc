@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
     result[rank][0] = total_computing_time;
     result[rank][1] = BaB_computing_time;
     
-    int row_to_gather_result[2];
+    double row_to_gather_result[2];
     for (int i = 0; i < 2; i++) {
         row_to_gather_result[i] = result[rank][i];
     }
