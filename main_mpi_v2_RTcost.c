@@ -382,7 +382,7 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
-    char* fileName="result_parallel.csv";
+    char* fileName="result_parallel_RTcost.csv";
     file = fopen(fileName, "r"); // open the file in "read" mode
     if (file == NULL) {
         file = fopen(fileName, "w"); //create new file in "write" mode
