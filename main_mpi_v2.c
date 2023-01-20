@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
         for(int i = 0; i < n ; i++){
             printf("%d ", best_path[index_best_path][i]);
         }
-        printf(\n);
+        printf("\n");
         printf("  | best_path_cost: %d \n", best_path_cost[index_best_path]);
    }
 
