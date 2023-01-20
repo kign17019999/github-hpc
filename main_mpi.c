@@ -3,7 +3,6 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <time.h>
-//#include <math.h>
 #include <mpi.h>
 
 #define MAX_CITIES 20
@@ -116,7 +115,8 @@ int main(int argc, char *argv[]) {
         row_to_gather[i] = best_path[rank][i];
     }
 
-    MPI_Allgather(row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
+    //MPI_Allgather(row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
+    MPI_Allgather(&row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
 
     MPI_Barrier(MPI_COMM_WORLD);
 
@@ -160,12 +160,12 @@ int main(int argc, char *argv[]) {
     }
     result[rank][4] = double_path;
     
-    double row_to_gather_result[2];
+    double row_to_gather_result[5];
     for (int i = 0; i < 5; i++) {
         row_to_gather_result[i] = result[rank][i];
     }
 
-    MPI_Allgather(row_to_gather_result, 3, MPI_DOUBLE  , result, 3, MPI_DOUBLE  , MPI_COMM_WORLD);
+    MPI_Allgather(row_to_gather_result, 5, MPI_DOUBLE  , result, 5, MPI_DOUBLE  , MPI_COMM_WORLD);
 
     if(rank==ROOT){
         double index_time = MPI_Wtime();
