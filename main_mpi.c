@@ -19,7 +19,7 @@ int (*result)[2];
 
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
-int save_result(int rank, char *dist_file, double computing_time);
+int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double BaB_computing_time);
 
 
 int main(int argc, char *argv[]) {
