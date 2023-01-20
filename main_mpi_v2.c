@@ -9,6 +9,7 @@
 #define INFINITE INT_MAX
 #define START_CITIES 0
 #define ROOT 0
+#define NUM_RESULT 6
 
 // mode 0 = send Dist by Bcast
 // mode 1 = send Dist by Ibcast
@@ -21,8 +22,7 @@ int (*dist)[MAX_CITIES];
 int (*best_path)[MAX_CITIES];
 int *best_path_cost;
 
-int num_result = 6;
-double (*result)[num_result];
+double (*result)[NUM_RESULT];
 double count_bb=0;
 
 int get_cities_info(char* file_path);
@@ -52,30 +52,33 @@ int main(int argc, char *argv[]) {
         file_path = myArg;
     }else{
         char *df_file = "input/dist4";
-        if (rank==ROOT) printf("[System] The default file (%s) will be used if no input is provided  \n", df_file);
+        if (rank==ROOT) printf("[ROOT] The default file (%s) will be used if no input is provided  \n", df_file);
         file_path  = df_file;
     }
     
 
     if(rank==ROOT){
         get_cities_info(file_path);
-        printf("n= %d \n", n);
+        printf("[ROOT] number of cities = %d \n", n);
     }
 
     double start_time2 = MPI_Wtime();
     if(rank==ROOT){
         if(mode==0){
             // mode 0 = send Dist by Bcast
+            printf("[ROOT] mode = 0 (send Dist by Bcast) \n");
             MPI_Bcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD);
             MPI_Bcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD);
 
         }else if(mode==1){
             // mode 1 = send Dist by Ibcast
+            printf("[ROOT] mode = 1 (send Dist by Ibcast) \n");
             MPI_Ibcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD, &request1);
             MPI_Ibcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD, &request2);
 
         }else if(mode==2){
             // mode 2 = send Dist by Send & Recv
+            printf("[ROOT] mode = 2 (send Dist by Send & Recv) \n");
             for (int i = 0; i < size; i++) {
                 MPI_Send(&n, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
                 MPI_Send(dist, MAX_CITIES*MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD);
@@ -83,6 +86,7 @@ int main(int argc, char *argv[]) {
 
         }else if(mode==3){
             // mode 3 = send Dist by Isend & Irecv
+            printf("[ROOT] mode = 3 (send Dist by Isend & Irecv) \n");
             for (int i = 0; i < size; i++) {
                     MPI_Isend(&n, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request1);
                     MPI_Isend(dist, MAX_CITIES*MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD, &request2);
@@ -192,12 +196,13 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        printf("best of the best is in rank %d, \n", index_best_path);
-        printf("  best_path: ");
+        printf("[ROOT]vbest of the best is in rank %d, \n", index_best_path);
+        printf("  | best_path: ");
         for(int i = 0; i < n ; i++){
             printf("%d ", best_path[index_best_path][i]);
         }
-        printf("\n  best_path_cost: %d \n", best_path_cost[index_best_path]);
+        printf(\n);
+        printf("  | best_path_cost: %d \n", best_path_cost[index_best_path]);
    }
 
     double end_time1 = MPI_Wtime();
@@ -208,12 +213,12 @@ int main(int argc, char *argv[]) {
     double sending_time = end_time2 - start_time2;
     double BaB_computing_time = end_time3 - start_time3;
     if (rank ==ROOT){
-        printf("rank=%d spent total : %f seconds\n", rank, total_computing_time);
-        printf("rank=%d spent Send  : %f seconds\n", rank, sending_time);
-        printf("rank=%d spent BaB   : %f seconds\n", rank, BaB_computing_time);
+        printf("[ROOT] spent total : %f seconds\n", total_computing_time);
+        printf("[ROOT] spent Send  : %f seconds\n", sending_time);
+        printf("[ROOT] spent BaB   : %f seconds\n", BaB_computing_time);
     }
     
-    result = malloc(sizeof(double[size][num_result]));
+    result = malloc(sizeof(double[size][NUM_RESULT]));
     result[rank][0] = total_computing_time;
     result[rank][1] = sending_time;
     result[rank][2] = BaB_computing_time;
@@ -223,14 +228,14 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<n; i++){
         double_path+=power(10, (n-i-1)*2)*best_path[rank][i];
     }
-    result[rank][num_result] = double_path;
+    result[rank][5] = double_path;
     
-    double row_to_gather_result[num_result];
-    for (int i = 0; i < num_result; i++) {
+    double row_to_gather_result[NUM_RESULT];
+    for (int i = 0; i < NUM_RESULT; i++) {
         row_to_gather_result[i] = result[rank][i];
     }
 
-    MPI_Allgather(row_to_gather_result, num_result, MPI_DOUBLE  , result, num_result, MPI_DOUBLE  , MPI_COMM_WORLD);
+    MPI_Allgather(row_to_gather_result, NUM_RESULT, MPI_DOUBLE  , result, NUM_RESULT, MPI_DOUBLE  , MPI_COMM_WORLD);
 
     if(rank==ROOT){
         double index_time = MPI_Wtime();
@@ -313,7 +318,7 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
 
     // Get the current date and time
     strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", &tm);
-    fprintf(file, "%f, %d, %s,%s,%f, %f, %f, %f, %f, %f, %d\n", index_time, rank, date, dist_file, total_computing_time, sending_time, BaB_computing_time, count_bab, r_best_cost, r_best_path, mode); // add new data to the file
+    fprintf(file, "%f, %d, %s, %s, %f, %f, %f, %f, %f, %f, %d\n", index_time, rank, date, dist_file, total_computing_time, sending_time, BaB_computing_time, count_bab, r_best_cost, r_best_path, mode); // add new data to the file
 
     fclose(file); // close the file
     return 0;
