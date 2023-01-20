@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <time.h>
-#include <math.h>
+//#include <math.h>
 #include <mpi.h>
 
 #define MAX_CITIES 20
@@ -153,9 +153,9 @@ int main(int argc, char *argv[]) {
     result[rank][1] = BaB_computing_time;
     result[rank][2] = count_bb;
     result[rank][3] = best_path_cost[rank];
-    double double_path = pow(10, 2*n)*404;
+    double double_path = power(10, 2*n)*404;
     for(int i=0; i<n; i++){
-        double_path+=pow(10, (n-i-1)*2)*best_path[rank][i];
+        double_path+=power(10, (n-i-1)*2)*best_path[rank][i];
     }
     result[rank][4] = double_path;
     
@@ -251,4 +251,16 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
 
     fclose(file); // close the file
     return 0;
+}
+
+double power(double base, int exponent) {
+    double result = 1;
+    while (exponent > 0) {
+        if (exponent & 1) { 
+            result *= base;
+        }
+        base *= base;
+        exponent >>= 1;
+    }
+    return result;
 }
