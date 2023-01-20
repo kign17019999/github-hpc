@@ -151,12 +151,12 @@ int main(int argc, char *argv[]) {
     result[rank][0] = total_computing_time;
     result[rank][1] = BaB_computing_time;
     
-    int row_to_gather[2];
+    int row_to_gather_result[2];
     for (int i = 0; i < 2; i++) {
-        row_to_gather[i] = result[rank][i];
+        row_to_gather_result[i] = result[rank][i];
     }
 
-    MPI_Allgather(row_to_gather, 2, MPI_DOUBLE_PRECISION , result, 2, MPI_DOUBLE_PRECISION , MPI_COMM_WORLD);
+    MPI_Allgather(row_to_gather_result, 2, MPI_DOUBLE_PRECISION , result, 2, MPI_DOUBLE_PRECISION , MPI_COMM_WORLD);
 
     if(rank==ROOT){
         double index_time = MPI_Wtime();
