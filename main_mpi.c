@@ -15,7 +15,7 @@ int (*dist)[MAX_CITIES];
 int (*best_path)[MAX_CITIES];
 int *best_path_cost;
 
-int (*result)[2];
+double (*result)[2];
 
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
         printf("rank=%d spent BaB   : %f seconds\n", rank, BaB_computing_time);
     }
     
-    result = malloc(sizeof(int[size][2]));
+    result = malloc(sizeof(double[size][2]));
     result[rank][0] = total_computing_time;
     result[rank][1] = BaB_computing_time;
     
@@ -156,11 +156,11 @@ int main(int argc, char *argv[]) {
         row_to_gather_result[i] = result[rank][i];
     }
 
-    MPI_Allgather(row_to_gather_result, 2, MPI_DOUBLE_PRECISION , result, 2, MPI_DOUBLE_PRECISION , MPI_COMM_WORLD);
+    MPI_Allgather(row_to_gather_result, 2, MPI_DOUBLE  , result, 2, MPI_DOUBLE  , MPI_COMM_WORLD);
 
     if(rank==ROOT){
         double index_time = MPI_Wtime();
-        for(int i=0; i<rank;i++){
+        for(int i=0; i<size;i++){
             save_result(index_time, i, file_path, result[i][0], result[i][1]);
         }
         
