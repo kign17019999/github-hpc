@@ -15,7 +15,7 @@
 // mode 1 = send Dist by Ibcast
 // mode 2 = send Dist by Send & Recv
 // mode 3 = send Dist by Isend & Irecv
-int mode = 0;
+int mode = 3;
 
 int n;
 int (*dist)[MAX_CITIES];
