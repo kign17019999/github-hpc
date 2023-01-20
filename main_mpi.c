@@ -13,8 +13,6 @@ int (*dist)[MAX_CITIES];
 int (*best_path)[MAX_CITIES];
 int *best_path_cost;
 
-int *computing_time;
-
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
 
@@ -44,9 +42,18 @@ int main(int argc, char *argv[]) {
         file_path  = df_file;
     }
 
-    get_cities_info(file_path);
+    if(rank==0){
+        get_cities_info(file_path);
+        printf("n= %d \n", n);
 
-    if(rank==0) printf("n= %d \n", n);
+        // Broadcast the array from the root processor
+        MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&dist, MAX_CITIES*MAX_CITIES, MPI_INT, 0, MPI_COMM_WORLD);
+    }else {
+        // Receive the array on all other processors
+        MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&dist, MAX_CITIES*MAX_CITIES, MPI_INT, 0, MPI_COMM_WORLD);
+    }
 
     for(int i=0; i<MAX_CITIES; i++){
         best_path_cost[i]=INFINITE;
@@ -185,7 +192,7 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
     }
 }
 
-int save_result(char *dist_file, double computing_time) {
+int save_result(int rank, char *dist_file, double computing_time) {
     FILE *file;
     char date[20];
     time_t t = time(NULL);
