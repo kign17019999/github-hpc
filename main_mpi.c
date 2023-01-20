@@ -13,6 +13,7 @@ int (*dist)[MAX_CITIES];
 int (*best_path)[MAX_CITIES];
 int *best_path_cost;
 
+int *computing_time;
 
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
@@ -123,11 +124,14 @@ int main(int argc, char *argv[]) {
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    double elapsed_time = end_time - start_time;
-    printf("rank=%d spent: %f seconds\n", rank, elapsed_time);
+    double computing_time = end_time - start_time;
+    printf("rank=%d spent: %f seconds\n", rank, computing_time);
 
 
     MPI_Finalize();
+
+    //save_result(file_path, computing_time);
+
     return 0;
 }
 
@@ -179,4 +183,28 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
 	        }
         }
     }
+}
+
+int save_result(char *dist_file, double computing_time) {
+    FILE *file;
+    char date[20];
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    char* fileName="result_serial.csv";
+    file = fopen(fileName, "r"); // open the file in "read" mode
+    if (file == NULL) {
+        file = fopen(fileName, "w"); //create new file in "write" mode
+        fprintf(file, "date-time, dist file, computing time (s)\n"); // add header to the file
+    } else {
+        fclose(file);
+        file = fopen(fileName, "a"); // open the file in "append" mode
+    }
+
+    // Get the current date and time
+    strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", &tm);
+    fprintf(file, "%s,%s,%f\n", date, dist_file, computing_time); // add new data to the file
+
+    fclose(file); // close the file
+    return 0;
 }
