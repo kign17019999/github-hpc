@@ -30,6 +30,9 @@ double (*result)[NUM_RESULT];
 double count_bb=0;
 
 int all_best_cost = INFINITE;
+int *global_request_Isend;
+int *global_request_Irecv;
+int *incoming_cost;
 
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank, int size);
@@ -335,11 +338,31 @@ int get_cities_info(char* file_path) {
 // }
 
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank, int size) {
+    if(count_bb==0){
+        MPI_Request request_Isend;
+        MPI_Request request_Irecv;
+        global_request_Isend = &request_Isend;
+        global_request_Irecv = &request_Irecv;
+        for(int i=0; i<size;i++){
+            if(i!=rank){
+                MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv);
+            }
+        }
+    }
     count_bb+=1;
     if (level == n) {
-        // for(int i=0; i<MAX_CITIES; i++){
-        //     if(all_best_cost>best_path_cost[i]) all_best_cost=best_path_cost[i];
-        // }
+        for(int i=0; i<size;i++){
+            if(i!=rank){
+                int flag;
+                MPI_Test(&global_request_Irecv, &flag, MPI_STATUS_IGNORE);
+                if(flag){
+                    if(incoming_cost < all_best_cost){
+                        all_best_cost = incoming_cost;
+                    }
+                    MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv);
+                }
+            }
+        }
         if (path_cost < all_best_cost) {
             best_path_cost[rank] = path_cost;
             all_best_cost = path_cost;
@@ -347,8 +370,8 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
 
             for(int i = 0; i < size; i++) {
                 if(i != rank) {
-                    MPI_Request request;
-                    MPI_Isend(&all_best_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &request);
+                    MPI_Cancel(&global_request_Isend);
+                    MPI_Isend(&all_best_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Isend);
                 }
             }
         }
@@ -366,17 +389,15 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
             }
         }
     }
-    MPI_Status status;
-    MPI_Request request;
     for(int i=0; i<size;i++){
         if(i!=rank){
-            int incoming_cost;
             int flag;
-            MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &request);
-            if(MPI_Test(&request, &flag, &status)) {
-                if(incoming_cost < all_best_cost) {
+            MPI_Test(&global_request_Irecv, &flag, MPI_STATUS_IGNORE);
+            if(flag){
+                if(incoming_cost < all_best_cost){
                     all_best_cost = incoming_cost;
-                }   
+                }
+                MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv);
             }
         }
     }
