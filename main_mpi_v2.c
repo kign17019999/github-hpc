@@ -339,7 +339,7 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
     file = fopen(fileName, "r"); // open the file in "read" mode
     if (file == NULL) {
         file = fopen(fileName, "w"); //create new file in "write" mode
-        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), BaB_computing_time (s), gathering_time (s), count_BaB, best_cost, best_path, mode_send, mode_gather\n"); // add header to the file
+        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), sending_time (s), BaB_computing_time (s), gathering_time (s), count_BaB, best_cost, best_path, mode_send, mode_gather\n"); // add header to the file
     } else {
         fclose(file);
         file = fopen(fileName, "a"); // open the file in "append" mode
