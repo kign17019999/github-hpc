@@ -332,7 +332,7 @@ int get_cities_info(char* file_path) {
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank, int size) {
     count_bb+=1;
     if (level == n) {
-        int start_time_RTcost = MPI_Wtime();
+        double start_time_RTcost = MPI_Wtime();
         for(int i=0; i<size;i++){
             if(i!=rank){
                 global_flag=0;
@@ -352,7 +352,7 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
             all_best_cost = path_cost;
             for (int i = 0; i < n; i++) best_path[rank][i] = path[i];
 
-            int start_time_RTcost = MPI_Wtime();
+            double start_time_RTcost = MPI_Wtime();
             for(int i = 0; i < size; i++) {
                 if(i != rank) {
                     if(check_first_Isend!=0){
