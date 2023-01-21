@@ -337,11 +337,12 @@ int get_cities_info(char* file_path) {
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank, int size) {
     count_bb+=1;
     if (level == n) {
-        for(int i=0; i<MAX_CITIES; i++){
-            if(all_best_cost>best_path_cost[i]) all_best_cost=best_path_cost[i];
-        }
+        // for(int i=0; i<MAX_CITIES; i++){
+        //     if(all_best_cost>best_path_cost[i]) all_best_cost=best_path_cost[i];
+        // }
         if (path_cost < all_best_cost) {
             best_path_cost[rank] = path_cost;
+            all_best_cost = path_cost;
             for (int i = 0; i < n; i++) best_path[rank][i] = path[i];
 
             for(int i = 0; i < size; i++) {
