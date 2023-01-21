@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
         while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
         file_path = myArg;
     }else{
-        char *df_file = "input/dist4";
+        char *df_file = "input/dist10";
         printf("[System] The default file (%s) will be used if no input is provided  \n", df_file);
         file_path  = df_file;
     }
@@ -58,15 +58,15 @@ int main(int argc, char *argv[]) {
     time_t end = time(NULL);
     double computing_time = difftime(end, start);
 
-    printf("Result: \n");
-    printf(">> Best path: ");
+    printf("[System] Result: \n");
+    printf("  | Best_path : ");
     for (int i = 0; i < n; i++) {
         printf("%d ", best_path[i]);
     }
     printf("\n");
-    printf(">> Cost: %d\n", best_path_cost);
+    printf("  | Best_path_cost : %d\n", best_path_cost);
     
-    printf(">> Computing time: %f\n", computing_time);
+    printf("[System] spent total : %f seconds\n", computing_time);
     
     free(dist);
 

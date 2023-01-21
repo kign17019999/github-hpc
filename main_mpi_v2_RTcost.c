@@ -30,6 +30,11 @@ double (*result)[NUM_RESULT];
 double count_bb=0;
 
 int all_best_cost = INFINITE;
+int global_request_Isend;
+int global_request_Irecv;
+int incoming_cost;
+int check_first_Isend=0;
+int global_flag;
 
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank, int size);
@@ -163,6 +168,16 @@ int main(int argc, char *argv[]) {
     }else if(rank >= number_of_cities_process_max){
         second_city = number_of_cities_process_max*max_city_per_rank+((rank-number_of_cities_process_max)*min_city_per_rank)+1;
         num_procs_cities = min_city_per_rank;
+    }
+
+    MPI_Request request_Isend;
+    MPI_Request request_Irecv;
+    global_request_Isend = request_Isend;
+    global_request_Irecv = request_Irecv;
+    for(int i=0; i<size;i++){
+        if(i!=rank){
+            MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv);
+        }
     }
 
     for(int i = second_city ; i < second_city+num_procs_cities; i++){
@@ -309,37 +324,21 @@ int get_cities_info(char* file_path) {
     fclose(file);
 }
 
-// void branch_and_bound_temp(int *path, int path_cost, int *visited, int level, int rank) {
-//     count_bb+=1;
-//     if (level == n) {
-//         for(int i=0; i<MAX_CITIES; i++){
-//             if(all_best_cost>best_path_cost[i]) all_best_cost=best_path_cost[i];
-//         }
-// 	    if (path_cost < all_best_cost) {
-//             best_path_cost[rank] = path_cost;
-//             for (int i = 0; i < n; i++) best_path[rank][i] = path[i];
-//         }
-//     } else {
-//         for (int i = 0; i < n; i++) {
-//             if (!visited[i]) {
-//                     path[level] = i;
-//                     visited[i] = 1;
-//                     int new_cost = path_cost + dist[i][path[level - 1]];        
-//             if (new_cost < all_best_cost) {
-//                         branch_and_bound(path, new_cost, visited, level + 1, rank);
-//                     }
-//                     visited[i] = 0;
-// 	        }
-//         }
-//     }
-// }
-
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank, int size) {
     count_bb+=1;
     if (level == n) {
-        // for(int i=0; i<MAX_CITIES; i++){
-        //     if(all_best_cost>best_path_cost[i]) all_best_cost=best_path_cost[i];
-        // }
+        for(int i=0; i<size;i++){
+            if(i!=rank){
+                global_flag=0;
+                MPI_Test(&global_request_Irecv, &global_flag, MPI_STATUS_IGNORE);
+                if(global_flag){
+                    if(incoming_cost < all_best_cost){
+                        all_best_cost = incoming_cost;
+                    }
+                    MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv);
+                }
+            }
+        }
         if (path_cost < all_best_cost) {
             best_path_cost[rank] = path_cost;
             all_best_cost = path_cost;
@@ -347,8 +346,12 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
 
             for(int i = 0; i < size; i++) {
                 if(i != rank) {
-                    MPI_Request request;
-                    MPI_Isend(&all_best_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &request);
+                    if(check_first_Isend!=0){
+                        MPI_Cancel(&global_request_Isend);
+                    }else{
+                        check_first_Isend++;
+                    }
+                    MPI_Isend(&all_best_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Isend);
                 }
             }
         }
@@ -366,20 +369,18 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
             }
         }
     }
-    MPI_Status status;
-    MPI_Request request;
-    for(int i=0; i<size;i++){
-        if(i!=rank){
-            int incoming_cost;
-            int flag;
-            MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &request);
-            if(MPI_Test(&request, &flag, &status)) {
-                if(incoming_cost < all_best_cost) {
-                    all_best_cost = incoming_cost;
-                }   
-            }
-        }
-    }
+    // for(int i=0; i<size;i++){
+    //     if(i!=rank){
+    //         global_flag=0;
+    //         MPI_Test(&global_request_Irecv, &global_flag, MPI_STATUS_IGNORE);
+    //         if(global_flag){
+    //             if(incoming_cost < all_best_cost){
+    //                 all_best_cost = incoming_cost;
+    //             }
+    //             MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv);
+    //         }
+    //     }
+    // }
 }
 
 int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path) {
