@@ -173,12 +173,16 @@ int main(int argc, char *argv[]) {
     path[0] = START_CITIES;
     visited[START_CITIES] = 1;
     for(int i=0; i<num_init_path; i++){
-        int rank=init_path_rank[i];
         if(init_path_rank[i]==rank){
             for(int j=1; j<n; j++){
                 path[j] = init_path[i][j];
                 visited[j] = init_visited[i][j];
             }
+            // printf("rank: %d | path: ", rank);
+            // for(int j=0; j<init_level; j++){
+            //     printf("%d ", path[j]);
+            // }
+            // printf("\n");
             branch_and_bound(path, init_cost[i], visited, init_level, rank);
         }
         

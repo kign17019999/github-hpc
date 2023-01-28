@@ -14,7 +14,7 @@ int *best_path;
 int best_path_cost = INFINITE;
 
 /*===================================================================*/
-#define START_CITIES 3
+#define START_CITIES 0
 
 int (*init_path)[MAX_CITIES];
 int *init_cost;
@@ -48,14 +48,14 @@ int main(int argc, char *argv[]) {
         while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
         file_path = myArg;
     }else{
-        char *df_file = "input/dist10";
+        char *df_file = "input/dist5";
         printf("[System] The default file (%s) will be used if no input is provided  \n", df_file);
         file_path  = df_file;
     }
     get_cities_info(file_path);
     
 /*=============================[   2   ]======================================*/
-    int size = 6;
+    int size = 5;
     int *path_i = malloc(MAX_CITIES * sizeof(int));
     int *visited_i = malloc(MAX_CITIES * sizeof(int));
     for(int i=0; i<MAX_CITIES; i++) visited_i[i]=0;
