@@ -43,6 +43,7 @@ double count_bb=0;
 
 int get_cities_info(char* file_path);
 void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size);
+void level_initiation(int size);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
 int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
 double power(double base, int exponent);
@@ -313,6 +314,44 @@ int get_cities_info(char* file_path) {
         row++;
     }
     fclose(file);
+}
+
+void level_initiation(int size){
+    for(int level=1; level<n; level++){
+        fork = fork*(n-level);
+        if(fork >= size || level==n-1){
+            init_level=level+1;
+            break;
+        }
+    }
+}
+
+void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size) {
+    if (level == init_level) {
+        for(int i=0; i<n; i++){
+            init_path[init_position][i] = path_i[i];
+            init_visited[init_position][i] = visited_i[i];
+        }
+        init_cost[init_position]=path_cost;
+        init_path_rank[init_position]=init_rank;
+        init_position++;
+
+        if(init_rank==size-1){
+            init_rank=0;
+        }else{
+            init_rank++;
+        }
+    } else {
+        for (int i = 0; i < n; i++) {
+            if (!visited_i[i]) {
+                path_i[level] = i;
+                visited_i[i] = 1;
+                int new_cost = path_cost + dist[i][path_i[level - 1]];
+                path_initiation(path_i, new_cost, visited_i, level + 1, size);
+                visited_i[i] = 0;
+            }
+        }
+    }
 }
 
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank) {

@@ -32,6 +32,7 @@ int best_rank;
 int get_cities_info(char* file_path);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
 void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size);
+void level_initiation(int size);
 int save_result(char* dist_file, double computing_time);
 
 int main(int argc, char *argv[]) {
@@ -61,7 +62,7 @@ int main(int argc, char *argv[]) {
 /*=============================[   2   ]======================================*/
     path_i[0] = START_CITIES;
     visited_i[START_CITIES] = 1;
-    cal_init_level(size);
+    level_initiation(size);
 
     int (*dist)[MAX_CITIES];
 
@@ -164,7 +165,7 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
     }
 }
 
-int cal_init_level(int size){
+void level_initiation(int size){
     for(int level=1; level<n; level++){
         fork = fork*(n-level);
         if(fork >= size || level==n-1){
