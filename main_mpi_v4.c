@@ -50,7 +50,7 @@ void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int 
 void level_initiation(int size);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
 void gather_result(int rank, int size);
-int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
+int save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
 double power(double base, int exponent);
 
 int main(int argc, char *argv[]) {
@@ -139,33 +139,9 @@ int main(int argc, char *argv[]) {
         printf("[ROOT] spent Gather: %f seconds\n", gathering_time);
     }
     
-    result = malloc(sizeof(double[size][NUM_RESULT]));
-    result[rank][0] = total_computing_time;
-    result[rank][1] = sending_time;
-    result[rank][2] = BaB_computing_time;
-    result[rank][3] = gathering_time;
-    result[rank][4] = count_bb;
-    result[rank][5] = best_path_cost[rank];
-    double double_path = power(10, 2*n)*404;
-    for(int i=0; i<n; i++){
-        double_path+=power(10, (n-i-1)*2)*best_path[rank][i];
-    }
-    result[rank][6] = double_path;
-    
-    double row_to_gather_result[NUM_RESULT];
-    for (int i = 0; i < NUM_RESULT; i++) {
-        row_to_gather_result[i] = result[rank][i];
-    }
+    save_result(rank, size, total_computing_time, sending_time, BaB_computing_time, gathering_time, file_path);
 
-    MPI_Allgather(row_to_gather_result, NUM_RESULT, MPI_DOUBLE  , result, NUM_RESULT, MPI_DOUBLE  , MPI_COMM_WORLD);
 
-    if(rank==ROOT){
-        double index_time = MPI_Wtime();
-        for(int i=0; i<size;i++){
-            save_result(index_time, i, file_path, result[i][0], result[i][1], result[i][2], result[i][3], result[i][4], result[i][5], result[i][6]);
-        }
-        
-    }
     
     MPI_Finalize();
     return 0;
@@ -394,7 +370,7 @@ void gather_result(int rank, int size){
     }    
 }
 
-int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path) {
+int save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path) {
     FILE *file;
     char date[20];
     time_t t = time(NULL);
@@ -416,6 +392,36 @@ int save_result(double index_time, int rank, char *dist_file, double total_compu
 
     fclose(file); // close the file
     return 0;
+}
+
+void save_result(int rank, int size, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, char* file_path){
+    result = malloc(sizeof(double[size][NUM_RESULT]));
+    result[rank][0] = total_computing_time;
+    result[rank][1] = sending_time;
+    result[rank][2] = BaB_computing_time;
+    result[rank][3] = gathering_time;
+    result[rank][4] = count_bb;
+    result[rank][5] = best_path_cost[rank];
+    double double_path = power(10, 2*n)*404;
+    for(int i=0; i<n; i++){
+        double_path+=power(10, (n-i-1)*2)*best_path[rank][i];
+    }
+    result[rank][6] = double_path;
+    
+    double row_to_gather_result[NUM_RESULT];
+    for (int i = 0; i < NUM_RESULT; i++) {
+        row_to_gather_result[i] = result[rank][i];
+    }
+
+    MPI_Allgather(row_to_gather_result, NUM_RESULT, MPI_DOUBLE  , result, NUM_RESULT, MPI_DOUBLE  , MPI_COMM_WORLD);
+
+    if(rank==ROOT){
+        double index_time = MPI_Wtime();
+        for(int i=0; i<size;i++){
+            save_result_csv(index_time, i, file_path, result[i][0], result[i][1], result[i][2], result[i][3], result[i][4], result[i][5], result[i][6]);
+        }
+        
+    }
 }
 
 double power(double base, int exponent) {
