@@ -6,7 +6,7 @@
 
 #define MAX_CITIES 20
 #define INFINITE INT_MAX
-#define START_CITIES 0
+#define START_CITIES 3
 
 int n;
 int (*dist)[MAX_CITIES];
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
         while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
         file_path = myArg;
     }else{
-        char *df_file = "input/dist6";
+        char *df_file = "input/dist5";
         printf("[System] The default file (%s) will be used if no input is provided  \n", df_file);
         file_path  = df_file;
     }

@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
         }
     }
     
-    if(rank==ROOT) printf("best path cost = %d | start with city = %d | total time = %d\n", the_best_path_cost, the_best_start, time_of_the_best);
+    if(rank==ROOT) printf("best path cost = %d | start with city = %d | total time = %f s\n", the_best_path_cost, the_best_start, time_of_the_best);
 
     MPI_Finalize();
     return 0;
@@ -312,11 +312,9 @@ void do_wsp(int rank, int size){
     //path and visit for branch_and_bound
     int *path = malloc(MAX_CITIES * sizeof(int));
     int *visited = malloc(MAX_CITIES * sizeof(int));
-    path[0] = START_CITIES;
-    visited[START_CITIES] = 1;
     for(int i=0; i<num_init_path; i++){
         if(init_path_rank[i]==rank){
-            for(int j=1; j<n; j++){
+            for(int j=0; j<n; j++){
                 path[j] = init_path[i][j];
                 visited[j] = init_visited[i][j];
             }

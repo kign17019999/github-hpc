@@ -6,7 +6,7 @@
 
 #define MAX_CITIES 20
 #define INFINITE INT_MAX
-#define START_CITIES 0
+#define START_CITIES 3
 
 int n;
 int (*dist)[MAX_CITIES];
@@ -14,8 +14,6 @@ int *best_path;
 int best_path_cost = INFINITE;
 
 /*===================================================================*/
-#define START_CITIES 0
-
 int (*init_path)[MAX_CITIES];
 int *init_cost;
 int (*init_visited)[MAX_CITIES];
@@ -75,13 +73,15 @@ int main(int argc, char *argv[]) {
     init_visited=malloc(sizeof(int[num_init_path][MAX_CITIES]));
     init_path_rank=malloc(num_init_path * sizeof(int));
     path_initiation(path_i, 0, visited_i, 1, size);
+    printf("start city %d \n", START_CITIES);
+    printf("init path: %d %d \n", init_path[0][0], init_path[0][1]);
 
 /*=============================[   2   ]======================================*/
 
     int *path = malloc(MAX_CITIES * sizeof(int));
     int *visited = malloc(MAX_CITIES * sizeof(int));
-    path[0] = START_CITIES;
-    visited[START_CITIES] = 1;
+    //path[0] = START_CITIES;
+    //visited[START_CITIES] = 1;
     for(int i=0; i<num_init_path; i++){
         int rank=init_path_rank[i];
         if(init_path_rank[i]==rank){
