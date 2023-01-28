@@ -44,7 +44,7 @@ double (*result)[NUM_RESULT];
 double count_bb=0;
 
 int get_cities_info(char* file_path);
-send_data_to_worker(int rank, int size);
+void send_data_to_worker(int rank, int size);
 void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size);
 void level_initiation(int size);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
