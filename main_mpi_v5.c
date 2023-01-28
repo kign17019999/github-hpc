@@ -13,15 +13,15 @@
 #define LOOP_ALL_FOR_1ST_CITY_is_true 1
 int START_CITIES=0;
 
-// mode_send 0 = send Dist by Bcast
-// mode_send 1 = send Dist by Ibcast
-// mode_send 2 = send Dist by Send & Recv
-// mode_send 3 = send Dist by Isend & Irecv
-int mode_send = 3;
+// MODE_SEND 0 = send Dist by Bcast
+// MODE_SEND 1 = send Dist by Ibcast
+// MODE_SEND 2 = send Dist by Send & Recv
+// MODE_SEND 3 = send Dist by Isend & Irecv
+#define MODE_SEND 3
 
-// mode_gather 0 = gather by Allgather
-// mode_gather 1 = gather by Send & Recv
-int mode_gather = 1;
+// MODE_GATHER 0 = gather by Allgather
+// MODE_GATHER 1 = gather by Send & Recv
+#define MODE_GATHER 1
 
 //path variable
 int n;
@@ -43,7 +43,7 @@ int num_init_path;
 double (*result)[NUM_RESULT];
 double count_bb;
 
-int get_cities_info(char* file_path);
+void get_cities_info(char* file_path);
 void send_data_to_worker(int rank, int size);
 void do_wsp(int rank, int size);
 void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size);
@@ -51,117 +51,126 @@ void level_initiation(int size);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
 void gather_result(int rank, int size);
 void save_result(int rank, int size, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, char* file_path);
-int save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
+void save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
 double power(double base, int exponent);
 
 int main(int argc, char *argv[]) {
-    int rank, size;
-    MPI_Init(&argc, &argv);
+    while(1){
+        int rank, size;
+        MPI_Init(&argc, &argv);
 
-    double start_time1 = MPI_Wtime();
+        double start_time1 = MPI_Wtime();
 
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-    MPI_Request request1, request2;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+        MPI_Request request1, request2;
 
-    //allocation path variable
-    dist = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
-    best_path = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
-    best_path_cost = malloc(sizeof(int[MAX_CITIES]));
+        //allocation path variable
+        dist = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
+        best_path = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
+        best_path_cost = malloc(sizeof(int[MAX_CITIES]));
 
-    char* file_path;
-    if(argc >=3 && strcmp("-i", argv[1]) == 0){
-        char* myArg = argv[2];
-        while (myArg[0] == '\'') myArg++;
-        while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
-        file_path = myArg;
-    }else{
-        char *df_file = "input/dist4";
-        if (rank==ROOT) printf("[ROOT] The default file (%s) will be used if no input is provided  \n", df_file);
-        file_path  = df_file;
-    }
-    
+        char* file_path;
+        if(argc >=3 && strcmp("-i", argv[1]) == 0){
+            char* myArg = argv[2];
+            while (myArg[0] == '\'') myArg++;
+            while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
+            file_path = myArg;
+        }else{
+            char *df_file = "input/dist4";
+            if (rank==ROOT) printf("[ROOT] The default file (%s) will be used if no input is provided  \n", df_file);
+            file_path  = df_file;
+        }
+        
 
-    if(rank==ROOT){
-        get_cities_info(file_path);
-        printf("[ROOT] number of cities = %d \n", n);
-        printf("[ROOT] number of processor = %d \n", size);
-        printf("__version__ == __test__\n");
-    }
+        if(rank==ROOT){
+            get_cities_info(file_path);
+            printf("[ROOT] number of cities = %d \n", n);
+            printf("[ROOT] number of processor = %d \n", size);
+            printf("__version__ == __test__\n");
+        }
 
-    /*send city data to all processor*/
-    double start_time2 = MPI_Wtime();
-    send_data_to_worker(rank, size);
-    double end_time2 = MPI_Wtime();
+        /*send city data to all processor*/
+        double start_time2 = MPI_Wtime();
+        send_data_to_worker(rank, size);
+        double end_time2 = MPI_Wtime();
 
-    /*solving wsp*/
-    double start_time3 = MPI_Wtime();
-    init_position=0;
-    init_level=0;
-    init_rank=0;
-    num_init_path=1;
-    count_bb=0;
-    do_wsp(rank, size);
-    double end_time3 = MPI_Wtime();
+        /*solving wsp*/
+        double start_time3 = MPI_Wtime();
+        init_position=0;
+        init_level=0;
+        init_rank=0;
+        num_init_path=1;
+        count_bb=0;
+        do_wsp(rank, size);
+        double end_time3 = MPI_Wtime();
 
-    /*gathering result*/
-    double start_time4 = MPI_Wtime();
-    gather_result(rank, size);
-    double end_time4 = MPI_Wtime();
+        /*gathering result*/
+        double start_time4 = MPI_Wtime();
+        gather_result(rank, size);
+        double end_time4 = MPI_Wtime();
 
-    //MPI_Barrier(MPI_COMM_WORLD);
+        //MPI_Barrier(MPI_COMM_WORLD);
 
-    if(rank==ROOT){
-        int min_dist=INFINITE;
-        int index_best_path;
-        for(int i=0; i<n; i++){
-            if(best_path_cost[i]<min_dist){
-                index_best_path = i;
-                min_dist = best_path_cost[i];
+        if(rank==ROOT){
+            int min_dist=INFINITE;
+            int index_best_path;
+            for(int i=0; i<n; i++){
+                if(best_path_cost[i]<min_dist){
+                    index_best_path = i;
+                    min_dist = best_path_cost[i];
+                }
             }
-        }
 
-        printf("[ROOT] best of the best is in rank %d, \n", index_best_path);
-        printf("  | best_path: ");
-        for(int i = 0; i < n ; i++){
-            printf("%d ", best_path[index_best_path][i]);
-        }
-        printf("\n");
-        printf("  | best_path_cost: %d \n", best_path_cost[index_best_path]);
-   }
-
-    double end_time1 = MPI_Wtime();
-
-    //MPI_Barrier(MPI_COMM_WORLD);
-
-    double total_computing_time = end_time1 - start_time1;
-    double sending_time = end_time2 - start_time2;
-    double BaB_computing_time = end_time3 - start_time3;
-    double gathering_time = end_time4 - start_time4;
-    if (rank ==ROOT){
-        printf("[ROOT] spent total : %f seconds\n", total_computing_time);
-        printf("[ROOT] spent Send  : %f seconds\n", sending_time);
-        printf("[ROOT] spent BaB   : %f seconds\n", BaB_computing_time);
-        printf("[ROOT] spent Gather: %f seconds\n", gathering_time);
+            printf("[ROOT] best of the best is in rank %d, \n", index_best_path);
+            printf("  | best_path: ");
+            for(int i = 0; i < n ; i++){
+                printf("%d ", best_path[index_best_path][i]);
+            }
+            printf("\n");
+            printf("  | best_path_cost: %d \n", best_path_cost[index_best_path]);
     }
-    
-    save_result(rank, size, total_computing_time, sending_time, BaB_computing_time, gathering_time, file_path);
 
-    MPI_Finalize();
-    
-    free(dist);
-    free(best_path);
-    free(best_path_cost);
-    free(init_path);
-    free(init_cost);
-    free(init_visited);
-    free(init_path_rank);
-    free(result);
+        double end_time1 = MPI_Wtime();
+
+        //MPI_Barrier(MPI_COMM_WORLD);
+
+        double total_computing_time = end_time1 - start_time1;
+        double sending_time = end_time2 - start_time2;
+        double BaB_computing_time = end_time3 - start_time3;
+        double gathering_time = end_time4 - start_time4;
+        if (rank ==ROOT){
+            printf("[ROOT] spent total : %f seconds\n", total_computing_time);
+            printf("[ROOT] spent Send  : %f seconds\n", sending_time);
+            printf("[ROOT] spent BaB   : %f seconds\n", BaB_computing_time);
+            printf("[ROOT] spent Gather: %f seconds\n", gathering_time);
+        }
+        
+        save_result(rank, size, total_computing_time, sending_time, BaB_computing_time, gathering_time, file_path);
+
+        MPI_Finalize();
+        
+        free(dist);
+        free(best_path);
+        free(best_path_cost);
+        free(init_path);
+        free(init_cost);
+        free(init_visited);
+        free(init_path_rank);
+        free(result);
+
+        if(LOOP_ALL_FOR_1ST_CITY_is_true==1){
+            START_CITIES++;
+            if(START_CITIES==n) break
+        }else{
+            break;
+        }
+    }
 
     return 0;
 }
 
-int get_cities_info(char* file_path) {
+void get_cities_info(char* file_path) {
     FILE* file = fopen(file_path, "r");
     
     //int number_of_city = 0;
@@ -193,40 +202,40 @@ int get_cities_info(char* file_path) {
 void send_data_to_worker(int rank, int size){
     MPI_Request request1, request2;
     if(rank==ROOT){
-        if(mode_send==0){
+        if(MODE_SEND==0){
             // mode 0 = send Dist by Bcast
-            printf("[ROOT] mode_send = 0 (send Dist by Bcast) \n");
+            printf("[ROOT] MODE_SEND = 0 (send Dist by Bcast) \n");
             MPI_Bcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD);
             MPI_Bcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD);
 
-        }else if(mode_send==1){
+        }else if(MODE_SEND==1){
             // mode 1 = send Dist by Ibcast
-            printf("[ROOT] mode_send = 1 (send Dist by Ibcast) \n");
+            printf("[ROOT] MODE_SEND = 1 (send Dist by Ibcast) \n");
             MPI_Ibcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD, &request1);
             MPI_Ibcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD, &request2);
 
-        }else if(mode_send==2){
+        }else if(MODE_SEND==2){
             // mode 2 = send Dist by Send & Recv
-            printf("[ROOT] mode_send = 2 (send Dist by Send & Recv) \n");
+            printf("[ROOT] MODE_SEND = 2 (send Dist by Send & Recv) \n");
             for (int i = 1; i < size; i++) {
                 MPI_Send(&n, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
                 MPI_Send(dist, MAX_CITIES*MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD);
             }
 
-        }else if(mode_send==3){
+        }else if(MODE_SEND==3){
             // mode 3 = send Dist by Isend & Irecv
-            printf("[ROOT] mode_send = 3 (send Dist by Isend & Irecv) \n");
+            printf("[ROOT] MODE_SEND = 3 (send Dist by Isend & Irecv) \n");
             for (int i = 1; i < size; i++) {
                     MPI_Isend(&n, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request1);
                     MPI_Isend(dist, MAX_CITIES*MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD, &request2);
             }
         }
     }else {
-        if(mode_send==0){
+        if(MODE_SEND==0){
             // mode 0 = send Dist by Bcast
             MPI_Bcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD);
             MPI_Bcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD);
-        }else if(mode_send==1){
+        }else if(MODE_SEND==1){
             // mode 1 = send Dist by Ibcast
             int flag;
             MPI_Ibcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD, &request1);
@@ -239,12 +248,12 @@ void send_data_to_worker(int rank, int size){
                 MPI_Test(&request2, &flag, MPI_STATUS_IGNORE);
             } while (!flag);
         
-        }else if(mode_send==2){
+        }else if(MODE_SEND==2){
             // mode 2 = send Dist by Send & Recv
             MPI_Recv(&n, 1, MPI_INT, ROOT, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             MPI_Recv(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-        }else if(mode_send==3){
+        }else if(MODE_SEND==3){
             // mode 3 = send Dist by Isend & Irecv
             MPI_Irecv(&n, 1, MPI_INT, ROOT, 0, MPI_COMM_WORLD, &request1);
             MPI_Irecv(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, 0, MPI_COMM_WORLD, &request2);
@@ -364,15 +373,15 @@ void gather_result(int rank, int size){
         row_to_gather[i] = best_path[rank][i];
     }
 
-    if(mode_gather==0){
-        // mode_gather 0 = gather by Allgather
-        if(rank==ROOT) printf("[ROOT] mode_gather = 0 (gather by Allgather) \n");
+    if(MODE_GATHER==0){
+        // MODE_GATHER 0 = gather by Allgather
+        if(rank==ROOT) printf("[ROOT] MODE_GATHER = 0 (gather by Allgather) \n");
         MPI_Allgather(&send_buf_cost, 1, MPI_INT, best_path_cost, 1, MPI_INT, MPI_COMM_WORLD);
         MPI_Allgather(&row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
-    }else if(mode_gather==1){
-        // mode_gather 1 = gather by Send & Recv
+    }else if(MODE_GATHER==1){
+        // MODE_GATHER 1 = gather by Send & Recv
         if(rank==ROOT){
-            printf("[ROOT] mode_gather = 1 (gather by Send & Recv) \n");
+            printf("[ROOT] MODE_GATHER = 1 (gather by Send & Recv) \n");
             for(int i=1; i<size; i++){
                 MPI_Recv(&best_path_cost[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             }
@@ -389,7 +398,7 @@ void gather_result(int rank, int size){
     }    
 }
 
-int save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path) {
+void save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path) {
     FILE *file;
     char date[20];
     time_t t = time(NULL);
@@ -399,7 +408,7 @@ int save_result_csv(double index_time, int rank, char *dist_file, double total_c
     file = fopen(fileName, "r"); // open the file in "read" mode
     if (file == NULL) {
         file = fopen(fileName, "w"); //create new file in "write" mode
-        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), sending_time (s), BaB_computing_time (s), gathering_time (s), count_BaB, best_cost, best_path, mode_send, mode_gather\n"); // add header to the file
+        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), sending_time (s), BaB_computing_time (s), gathering_time (s), count_BaB, best_cost, best_path, MODE_SEND, MODE_GATHER\n"); // add header to the file
     } else {
         fclose(file);
         file = fopen(fileName, "a"); // open the file in "append" mode
@@ -407,10 +416,9 @@ int save_result_csv(double index_time, int rank, char *dist_file, double total_c
 
     // Get the current date and time
     strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", &tm);
-    fprintf(file, "%f, %d, %s, %s, %f, %f, %f, %f, %f, %f, %f, %d, %d\n", index_time, rank, date, dist_file, total_computing_time, sending_time, BaB_computing_time, gathering_time, count_bab, r_best_cost, r_best_path, mode_send, mode_gather); // add new data to the file
+    fprintf(file, "%f, %d, %s, %s, %f, %f, %f, %f, %f, %f, %f, %d, %d\n", index_time, rank, date, dist_file, total_computing_time, sending_time, BaB_computing_time, gathering_time, count_bab, r_best_cost, r_best_path, MODE_SEND, MODE_GATHER); // add new data to the file
 
     fclose(file); // close the file
-    return 0;
 }
 
 void save_result(int rank, int size, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, char* file_path){
