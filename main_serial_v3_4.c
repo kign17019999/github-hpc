@@ -24,7 +24,7 @@ int *init_path_rank;
 int init_position=0;
 int init_level=0;
 int init_rank=0;
-int fork=1;
+int num_init_path=1;
 
 int best_rank;
 /*===================================================================*/
@@ -66,14 +66,14 @@ int main(int argc, char *argv[]) {
 
     int (*dist)[MAX_CITIES];
 
-    // int (*init_path)[MAX_CITIES]=malloc(sizeof(int[fork][MAX_CITIES]));
-    // int *init_cost=malloc(fork * sizeof(int));
-    // int (*init_visited)[MAX_CITIES]=malloc(sizeof(int[fork][MAX_CITIES]));
+    // int (*init_path)[MAX_CITIES]=malloc(sizeof(int[num_init_path][MAX_CITIES]));
+    // int *init_cost=malloc(num_init_path * sizeof(int));
+    // int (*init_visited)[MAX_CITIES]=malloc(sizeof(int[num_init_path][MAX_CITIES]));
 
-    init_path=malloc(sizeof(int[fork][MAX_CITIES]));
-    init_cost=malloc(fork * sizeof(int));
-    init_visited=malloc(sizeof(int[fork][MAX_CITIES]));
-    init_path_rank=malloc(fork * sizeof(int));
+    init_path=malloc(sizeof(int[num_init_path][MAX_CITIES]));
+    init_cost=malloc(num_init_path * sizeof(int));
+    init_visited=malloc(sizeof(int[num_init_path][MAX_CITIES]));
+    init_path_rank=malloc(num_init_path * sizeof(int));
     path_initiation(path_i, 0, visited_i, 1, size);
 
 /*=============================[   2   ]======================================*/
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     int *visited = malloc(MAX_CITIES * sizeof(int));
     path[0] = START_CITIES;
     visited[START_CITIES] = 1;
-    for(int i=0; i<fork; i++){
+    for(int i=0; i<num_init_path; i++){
         int rank=init_path_rank[i];
         if(init_path_rank[i]==rank){
             for(int j=1; j<n; j++){
@@ -167,8 +167,8 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
 
 void level_initiation(int size){
     for(int level=1; level<n; level++){
-        fork = fork*(n-level);
-        if(fork >= size || level==n-1){
+        num_init_path = num_init_path*(n-level);
+        if(num_init_path >= size || level==n-1){
             init_level=level+1;
             break;
         }
