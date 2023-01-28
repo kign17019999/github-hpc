@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<MAX_CITIES; i++) visited_i[i]=0;
     path_i[0] = START_CITIES;
     visited_i[START_CITIES] = 1;
-    cal_init_level(size);
+    level_initiation(size);
 
     //path initiation
     init_path=malloc(sizeof(int[fork][MAX_CITIES]));
