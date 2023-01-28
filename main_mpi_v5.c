@@ -207,19 +207,19 @@ void send_data_to_worker(int rank, int size){
     if(rank==ROOT){
         if(MODE_SEND==0){
             // mode 0 = send Dist by Bcast
-            printf("[ROOT] MODE_SEND = 0 (send Dist by Bcast) \n");
+            printf("    [ROOT] MODE_SEND = 0 (send Dist by Bcast) \n");
             MPI_Bcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD);
             MPI_Bcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD);
 
         }else if(MODE_SEND==1){
             // mode 1 = send Dist by Ibcast
-            printf("[ROOT] MODE_SEND = 1 (send Dist by Ibcast) \n");
+            printf("    [ROOT] MODE_SEND = 1 (send Dist by Ibcast) \n");
             MPI_Ibcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD, &request1);
             MPI_Ibcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD, &request2);
 
         }else if(MODE_SEND==2){
             // mode 2 = send Dist by Send & Recv
-            printf("[ROOT] MODE_SEND = 2 (send Dist by Send & Recv) \n");
+            printf("    [ROOT] MODE_SEND = 2 (send Dist by Send & Recv) \n");
             for (int i = 1; i < size; i++) {
                 MPI_Send(&n, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
                 MPI_Send(dist, MAX_CITIES*MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD);
@@ -227,7 +227,7 @@ void send_data_to_worker(int rank, int size){
 
         }else if(MODE_SEND==3){
             // mode 3 = send Dist by Isend & Irecv
-            printf("[ROOT] MODE_SEND = 3 (send Dist by Isend & Irecv) \n");
+            printf("    [ROOT] MODE_SEND = 3 (send Dist by Isend & Irecv) \n");
             for (int i = 1; i < size; i++) {
                     MPI_Isend(&n, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request1);
                     MPI_Isend(dist, MAX_CITIES*MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD, &request2);
@@ -378,13 +378,13 @@ void gather_result(int rank, int size){
 
     if(MODE_GATHER==0){
         // MODE_GATHER 0 = gather by Allgather
-        if(rank==ROOT) printf("[ROOT] MODE_GATHER = 0 (gather by Allgather) \n");
+        if(rank==ROOT) printf(" [ROOT] MODE_GATHER = 0 (gather by Allgather) \n");
         MPI_Allgather(&send_buf_cost, 1, MPI_INT, best_path_cost, 1, MPI_INT, MPI_COMM_WORLD);
         MPI_Allgather(&row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
     }else if(MODE_GATHER==1){
         // MODE_GATHER 1 = gather by Send & Recv
         if(rank==ROOT){
-            printf("[ROOT] MODE_GATHER = 1 (gather by Send & Recv) \n");
+            printf("    [ROOT] MODE_GATHER = 1 (gather by Send & Recv) \n");
             for(int i=1; i<size; i++){
                 MPI_Recv(&best_path_cost[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             }
