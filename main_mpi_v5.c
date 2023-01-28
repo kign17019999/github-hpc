@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
     
     while(1){
+        printf("====================================================\n");
         if(LOOP_ALL_FOR_1ST_CITY_is_true==1) printf("Start with City %d \n", START_CITIES);
         
         int rank, size;
