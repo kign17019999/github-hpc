@@ -65,11 +65,11 @@ int check_best=0;
 int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
     
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    
     while(1){
-        int rank, size;
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        MPI_Comm_size(MPI_COMM_WORLD, &size);
-
         if(rank==ROOT){
             if(PRINT_DETAIL_is_true==1) printf("====================================================\n");
             if(PRINT_DETAIL_is_true==1) if(LOOP_ALL_FOR_1ST_CITY_is_true==1) printf("Start with City %d \n", START_CITIES);
