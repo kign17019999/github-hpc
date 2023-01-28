@@ -45,6 +45,7 @@ double count_bb=0;
 
 int get_cities_info(char* file_path);
 void send_data_to_worker(int rank, int size);
+void do_wsp(int rank, int size);
 void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size);
 void level_initiation(int size);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
@@ -89,42 +90,7 @@ int main(int argc, char *argv[]) {
     double end_time2 = MPI_Wtime();
 
     double start_time3 = MPI_Wtime();
-
-    for(int i=0; i<MAX_CITIES; i++){
-        best_path_cost[i]=INFINITE;
-    }
-
-    //path and visit for initiation
-    int *path_i = malloc(MAX_CITIES * sizeof(int));
-    int *visited_i = malloc(MAX_CITIES * sizeof(int));
-    for(int i=0; i<MAX_CITIES; i++) visited_i[i]=0;
-    path_i[0] = START_CITIES;
-    visited_i[START_CITIES] = 1;
-    level_initiation(size);
-
-    //path initiation
-    init_path=malloc(sizeof(int[num_init_path][MAX_CITIES]));
-    init_cost=malloc(num_init_path * sizeof(int));
-    init_visited=malloc(sizeof(int[num_init_path][MAX_CITIES]));
-    init_path_rank=malloc(num_init_path * sizeof(int));
-    path_initiation(path_i, 0, visited_i, 1, size);    
-
-    //path and visit for branch_and_bound
-    int *path = malloc(MAX_CITIES * sizeof(int));
-    int *visited = malloc(MAX_CITIES * sizeof(int));
-    path[0] = START_CITIES;
-    visited[START_CITIES] = 1;
-    for(int i=0; i<num_init_path; i++){
-        if(init_path_rank[i]==rank){
-            for(int j=1; j<n; j++){
-                path[j] = init_path[i][j];
-                visited[j] = init_visited[i][j];
-            }
-            branch_and_bound(path, init_cost[i], visited, init_level, rank);
-        }
-        
-    }
-
+    do_wsp(rank, size);
     double end_time3 = MPI_Wtime();
 
     double start_time4 = MPI_Wtime();
@@ -320,6 +286,43 @@ void send_data_to_worker(int rank, int size){
 
         }
     }
+}
+
+void do_wsp(int rank, int size){
+    for(int i=0; i<MAX_CITIES; i++){
+        best_path_cost[i]=INFINITE;
+    }
+
+    //path and visit for initiation
+    int *path_i = malloc(MAX_CITIES * sizeof(int));
+    int *visited_i = malloc(MAX_CITIES * sizeof(int));
+    for(int i=0; i<MAX_CITIES; i++) visited_i[i]=0;
+    path_i[0] = START_CITIES;
+    visited_i[START_CITIES] = 1;
+    level_initiation(size);
+
+    //path initiation
+    init_path=malloc(sizeof(int[num_init_path][MAX_CITIES]));
+    init_cost=malloc(num_init_path * sizeof(int));
+    init_visited=malloc(sizeof(int[num_init_path][MAX_CITIES]));
+    init_path_rank=malloc(num_init_path * sizeof(int));
+    path_initiation(path_i, 0, visited_i, 1, size);    
+
+    //path and visit for branch_and_bound
+    int *path = malloc(MAX_CITIES * sizeof(int));
+    int *visited = malloc(MAX_CITIES * sizeof(int));
+    path[0] = START_CITIES;
+    visited[START_CITIES] = 1;
+    for(int i=0; i<num_init_path; i++){
+        if(init_path_rank[i]==rank){
+            for(int j=1; j<n; j++){
+                path[j] = init_path[i][j];
+                visited[j] = init_visited[i][j];
+            }
+            branch_and_bound(path, init_cost[i], visited, init_level, rank);
+        }
+        
+    }    
 }
 
 void level_initiation(int size){
