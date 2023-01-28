@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
 
         if(LOOP_ALL_FOR_1ST_CITY_is_true==1){
             START_CITIES++;
-            if(START_CITIES==n) break
+            if(START_CITIES==n) break;
         }else{
             break;
         }
