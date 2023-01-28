@@ -34,14 +34,14 @@ int (*init_path)[MAX_CITIES];
 int *init_cost;
 int (*init_visited)[MAX_CITIES];
 int *init_path_rank;
-int init_position=0;
-int init_level=0;
-int init_rank=0;
-int num_init_path=1;
+int init_position;
+int init_level;
+int init_rank;
+int num_init_path;
 
 //other variable
 double (*result)[NUM_RESULT];
-double count_bb=0;
+double count_bb;
 
 int get_cities_info(char* file_path);
 void send_data_to_worker(int rank, int size);
@@ -64,11 +64,6 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Request request1, request2;
 
-    //allocation path variable
-    dist = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
-    best_path = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
-    best_path_cost = malloc(sizeof(int[MAX_CITIES]));
-
     char* file_path;
     if(argc >=3 && strcmp("-i", argv[1]) == 0){
         char* myArg = argv[2];
@@ -89,6 +84,11 @@ int main(int argc, char *argv[]) {
         printf("__version__ == __test__\n");
     }
 
+    //allocation path variable
+    dist = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
+    best_path = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
+    best_path_cost = malloc(sizeof(int[MAX_CITIES]));
+
     /*send city data to all processor*/
     double start_time2 = MPI_Wtime();
     send_data_to_worker(rank, size);
@@ -96,6 +96,11 @@ int main(int argc, char *argv[]) {
 
     /*solving wsp*/
     double start_time3 = MPI_Wtime();
+    init_position=0;
+    init_level=0;
+    init_rank=0;
+    num_init_path=1;
+    count_bb=0;
     do_wsp(rank, size);
     double end_time3 = MPI_Wtime();
 
@@ -142,9 +147,17 @@ int main(int argc, char *argv[]) {
     
     save_result(rank, size, total_computing_time, sending_time, BaB_computing_time, gathering_time, file_path);
 
-
-    
     MPI_Finalize();
+    
+    free(dist);
+    free(best_path);
+    free(best_path_cost);
+    free(init_path);
+    free(init_cost);
+    free(init_visited);
+    free(init_path_rank);
+    free(result);
+
     return 0;
 }
 
@@ -276,7 +289,12 @@ void do_wsp(int rank, int size){
             branch_and_bound(path, init_cost[i], visited, init_level, rank);
         }
         
-    }    
+    }
+
+    free(path_i);
+    free(visited_i);
+    free(path);
+    free(visited);
 }
 
 void level_initiation(int size){
