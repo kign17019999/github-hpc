@@ -23,6 +23,9 @@ int START_CITIES=0;
 // MODE_GATHER 1 = gather by Send & Recv
 #define MODE_GATHER 1
 
+#define PRINT_DETAIL_is_true 0
+#define SAVE_CSV_is_true 0
+
 //path variable
 int n;
 int (*dist)[MAX_CITIES];
@@ -56,6 +59,8 @@ double power(double base, int exponent);
 
 int the_best_path_cost=INFINITE;
 int the_best_start;
+double time_of_the_best;
+int check_best=0;
 
 int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
@@ -66,8 +71,8 @@ int main(int argc, char *argv[]) {
         MPI_Comm_size(MPI_COMM_WORLD, &size);
 
         if(rank==ROOT){
-            printf("====================================================\n");
-            if(LOOP_ALL_FOR_1ST_CITY_is_true==1) printf("Start with City %d \n", START_CITIES);
+            if(PRINT_DETAIL_is_true==1) printf("====================================================\n");
+            if(PRINT_DETAIL_is_true==1) if(LOOP_ALL_FOR_1ST_CITY_is_true==1) printf("Start with City %d \n", START_CITIES);
         }
 
         double start_time1 = MPI_Wtime();
@@ -87,15 +92,15 @@ int main(int argc, char *argv[]) {
             file_path = myArg;
         }else{
             char *df_file = "   input/dist4";
-            if (rank==ROOT) printf("    [ROOT] The default file (%s) will be used if no input is provided  \n", df_file);
+            if(PRINT_DETAIL_is_true==1) if (rank==ROOT) printf("    [ROOT] The default file (%s) will be used if no input is provided  \n", df_file);
             file_path  = df_file;
         }
         
 
         if(rank==ROOT){
             get_cities_info(file_path);
-            printf("    [ROOT] number of cities = %d \n", n);
-            printf("    [ROOT] number of processor = %d \n", size);
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] number of cities = %d \n", n);
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] number of processor = %d \n", size);
         }
 
         /*send city data to all processor*/
@@ -130,17 +135,18 @@ int main(int argc, char *argv[]) {
                 }
             }
 
-            printf("    [ROOT] best of the best is in rank %d, \n", index_best_path);
-            printf("      | best_path: ");
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] best of the best is in rank %d, \n", index_best_path);
+            if(PRINT_DETAIL_is_true==1) printf("      | best_path: ");
             for(int i = 0; i < n ; i++){
-                printf("%d ", best_path[index_best_path][i]);
+                if(PRINT_DETAIL_is_true==1) printf("%d ", best_path[index_best_path][i]);
             }
-            printf("\n");
-            printf("      | best_path_cost: %d \n", best_path_cost[index_best_path]);
+            if(PRINT_DETAIL_is_true==1) printf("\n");
+            if(PRINT_DETAIL_is_true==1) printf("      | best_path_cost: %d \n", best_path_cost[index_best_path]);
 
             if(the_best_path_cost>best_path_cost[index_best_path]){
                 the_best_path_cost = best_path_cost[index_best_path];
                 the_best_start = START_CITIES;
+                check_best=1;
             }
 
         }
@@ -154,15 +160,17 @@ int main(int argc, char *argv[]) {
         double BaB_computing_time = end_time3 - start_time3;
         double gathering_time = end_time4 - start_time4;
         if (rank ==ROOT){
-            printf("    [ROOT] spent total : %f seconds\n", total_computing_time);
-            printf("    [ROOT] spent Send  : %f seconds\n", sending_time);
-            printf("    [ROOT] spent BaB   : %f seconds\n", BaB_computing_time);
-            printf("    [ROOT] spent Gather: %f seconds\n", gathering_time);
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] spent total : %f seconds\n", total_computing_time);
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] spent Send  : %f seconds\n", sending_time);
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] spent BaB   : %f seconds\n", BaB_computing_time);
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] spent Gather: %f seconds\n", gathering_time);
+        }
+        if(check_best==1){
+            time_of_the_best = total_computing_time;
+            check_best=0;
         }
 
-        if(rank==ROOT) printf("best path cost = %d", the_best_path_cost);
-        
-        save_result(rank, size, total_computing_time, sending_time, BaB_computing_time, gathering_time, file_path);
+        if(SAVE_CSV_is_true==1) save_result(rank, size, total_computing_time, sending_time, BaB_computing_time, gathering_time, file_path);
 
         free(dist);
         free(best_path);
@@ -180,6 +188,9 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
+    
+    if(rank==ROOT) printf("best path cost = %d | start with city = %d | total time = %d\n", the_best_path_cost, the_best_start, time_of_the_best);
+
     MPI_Finalize();
     return 0;
 }
@@ -218,19 +229,19 @@ void send_data_to_worker(int rank, int size){
     if(rank==ROOT){
         if(MODE_SEND==0){
             // mode 0 = send Dist by Bcast
-            printf("    [ROOT] MODE_SEND = 0 (send Dist by Bcast) \n");
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] MODE_SEND = 0 (send Dist by Bcast) \n");
             MPI_Bcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD);
             MPI_Bcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD);
 
         }else if(MODE_SEND==1){
             // mode 1 = send Dist by Ibcast
-            printf("    [ROOT] MODE_SEND = 1 (send Dist by Ibcast) \n");
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] MODE_SEND = 1 (send Dist by Ibcast) \n");
             MPI_Ibcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD, &request1);
             MPI_Ibcast(dist, MAX_CITIES*MAX_CITIES, MPI_INT, ROOT, MPI_COMM_WORLD, &request2);
 
         }else if(MODE_SEND==2){
             // mode 2 = send Dist by Send & Recv
-            printf("    [ROOT] MODE_SEND = 2 (send Dist by Send & Recv) \n");
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] MODE_SEND = 2 (send Dist by Send & Recv) \n");
             for (int i = 1; i < size; i++) {
                 MPI_Send(&n, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
                 MPI_Send(dist, MAX_CITIES*MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD);
@@ -238,7 +249,7 @@ void send_data_to_worker(int rank, int size){
 
         }else if(MODE_SEND==3){
             // mode 3 = send Dist by Isend & Irecv
-            printf("    [ROOT] MODE_SEND = 3 (send Dist by Isend & Irecv) \n");
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] MODE_SEND = 3 (send Dist by Isend & Irecv) \n");
             for (int i = 1; i < size; i++) {
                     MPI_Isend(&n, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request1);
                     MPI_Isend(dist, MAX_CITIES*MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD, &request2);
@@ -389,13 +400,13 @@ void gather_result(int rank, int size){
 
     if(MODE_GATHER==0){
         // MODE_GATHER 0 = gather by Allgather
-        if(rank==ROOT) printf(" [ROOT] MODE_GATHER = 0 (gather by Allgather) \n");
+        if(rank==ROOT) if(PRINT_DETAIL_is_true==1) printf(" [ROOT] MODE_GATHER = 0 (gather by Allgather) \n");
         MPI_Allgather(&send_buf_cost, 1, MPI_INT, best_path_cost, 1, MPI_INT, MPI_COMM_WORLD);
         MPI_Allgather(&row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
     }else if(MODE_GATHER==1){
         // MODE_GATHER 1 = gather by Send & Recv
         if(rank==ROOT){
-            printf("    [ROOT] MODE_GATHER = 1 (gather by Send & Recv) \n");
+            if(PRINT_DETAIL_is_true==1) printf("    [ROOT] MODE_GATHER = 1 (gather by Send & Recv) \n");
             for(int i=1; i<size; i++){
                 MPI_Recv(&best_path_cost[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             }
