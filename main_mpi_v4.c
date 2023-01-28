@@ -44,7 +44,7 @@ double (*result)[NUM_RESULT];
 double count_bb=0;
 
 int get_cities_info(char* file_path);
-send_data_to_worker(int rank, MPI_Request request1, MPI_Request request2);
+send_data_to_worker(int rank, int size);
 void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size);
 void level_initiation(int size);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     }
 
     double start_time2 = MPI_Wtime();
-    send_data_to_worker(rank, request1, request2);
+    send_data_to_worker(rank, size);
     double end_time2 = MPI_Wtime();
 
     double start_time3 = MPI_Wtime();
@@ -257,7 +257,8 @@ int get_cities_info(char* file_path) {
     fclose(file);
 }
 
-void send_data_to_worker(int rank, MPI_Request request1, MPI_Request request2){
+void send_data_to_worker(int rank, int size){
+    MPI_Request request1, request2;
     if(rank==ROOT){
         if(mode_send==0){
             // mode 0 = send Dist by Bcast
