@@ -49,6 +49,7 @@ void do_wsp(int rank, int size);
 void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size);
 void level_initiation(int size);
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
+void gather_result(int rank, int size);
 int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
 double power(double base, int exponent);
 
@@ -83,47 +84,23 @@ int main(int argc, char *argv[]) {
     if(rank==ROOT){
         get_cities_info(file_path);
         printf("[ROOT] number of cities = %d \n", n);
+        printf("[ROOT] number of processor = %d \n", size);
+        printf("__version__ == __test__\n");
     }
 
+    /*send city data to all processor*/
     double start_time2 = MPI_Wtime();
     send_data_to_worker(rank, size);
     double end_time2 = MPI_Wtime();
 
+    /*solving wsp*/
     double start_time3 = MPI_Wtime();
     do_wsp(rank, size);
     double end_time3 = MPI_Wtime();
 
+    /*gathering result*/
     double start_time4 = MPI_Wtime();
-
-    int send_buf_cost = best_path_cost[rank];
-    int row_to_gather[MAX_CITIES];
-    for (int i = 0; i < MAX_CITIES; i++) {
-        row_to_gather[i] = best_path[rank][i];
-    }
-
-    if(mode_gather==0){
-        // mode_gather 0 = gather by Allgather
-        if(rank==ROOT) printf("[ROOT] mode_gather = 0 (gather by Allgather) \n");
-        MPI_Allgather(&send_buf_cost, 1, MPI_INT, best_path_cost, 1, MPI_INT, MPI_COMM_WORLD);
-        MPI_Allgather(&row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
-    }else if(mode_gather==1){
-        // mode_gather 1 = gather by Send & Recv
-        if(rank==ROOT){
-            printf("[ROOT] mode_gather = 1 (gather by Send & Recv) \n");
-            for(int i=1; i<size; i++){
-                MPI_Recv(&best_path_cost[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            }
-            for(int i=1; i<size; i++){
-                MPI_Recv(&row_to_gather, MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                for(int j=0; j<n; j++){
-                    best_path[i][j]=row_to_gather[j];
-                }
-            }
-        }else{
-            MPI_Send(&send_buf_cost, 1, MPI_INT, ROOT, 0, MPI_COMM_WORLD);
-            MPI_Send(&row_to_gather, MAX_CITIES, MPI_INT, ROOT, 0, MPI_COMM_WORLD);
-        }
-    }
+    gather_result(rank, size);
     double end_time4 = MPI_Wtime();
 
     //MPI_Barrier(MPI_COMM_WORLD);
@@ -383,6 +360,38 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
 	        }
         }
     }
+}
+
+void gather_result(int rank, int size){
+    int send_buf_cost = best_path_cost[rank];
+    int row_to_gather[MAX_CITIES];
+    for (int i = 0; i < MAX_CITIES; i++) {
+        row_to_gather[i] = best_path[rank][i];
+    }
+
+    if(mode_gather==0){
+        // mode_gather 0 = gather by Allgather
+        if(rank==ROOT) printf("[ROOT] mode_gather = 0 (gather by Allgather) \n");
+        MPI_Allgather(&send_buf_cost, 1, MPI_INT, best_path_cost, 1, MPI_INT, MPI_COMM_WORLD);
+        MPI_Allgather(&row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
+    }else if(mode_gather==1){
+        // mode_gather 1 = gather by Send & Recv
+        if(rank==ROOT){
+            printf("[ROOT] mode_gather = 1 (gather by Send & Recv) \n");
+            for(int i=1; i<size; i++){
+                MPI_Recv(&best_path_cost[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            }
+            for(int i=1; i<size; i++){
+                MPI_Recv(&row_to_gather, MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                for(int j=0; j<n; j++){
+                    best_path[i][j]=row_to_gather[j];
+                }
+            }
+        }else{
+            MPI_Send(&send_buf_cost, 1, MPI_INT, ROOT, 0, MPI_COMM_WORLD);
+            MPI_Send(&row_to_gather, MAX_CITIES, MPI_INT, ROOT, 0, MPI_COMM_WORLD);
+        }
+    }    
 }
 
 int save_result(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path) {
