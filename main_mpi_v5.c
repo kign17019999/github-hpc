@@ -55,14 +55,15 @@ void save_result_csv(double index_time, int rank, char *dist_file, double total_
 double power(double base, int exponent);
 
 int main(int argc, char *argv[]) {
+    MPI_Init(&argc, &argv);
+    
     while(1){
         int rank, size;
-        MPI_Init(&argc, &argv);
-
-        double start_time1 = MPI_Wtime();
-
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
         MPI_Comm_size(MPI_COMM_WORLD, &size);
+        
+        double start_time1 = MPI_Wtime();
+
         MPI_Request request1, request2;
 
         //allocation path variable
@@ -148,8 +149,6 @@ int main(int argc, char *argv[]) {
         
         save_result(rank, size, total_computing_time, sending_time, BaB_computing_time, gathering_time, file_path);
 
-        MPI_Finalize();
-        
         free(dist);
         free(best_path);
         free(best_path_cost);
@@ -166,7 +165,7 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
-
+    MPI_Finalize();
     return 0;
 }
 
