@@ -6,7 +6,7 @@
 
 #define MAX_CITIES 20
 #define INFINITE INT_MAX
-#define START_CITIES 0
+#define START_CITIES 3
 
 int n;
 int (*dist)[MAX_CITIES];

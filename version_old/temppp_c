@@ -1,0 +1,40 @@
+void calculate_levels(int num_processors, int num_cities, int level_from[MAX_PROCESSORS][MAX_CITIES], int level_to[MAX_PROCESSORS][MAX_CITIES]) {
+    // Initialize level_from and level_to to -1
+    for (int i = 0; i < MAX_P; i++) {
+        for (int j = 0; j < MAX_CITIES; j++) {
+            level_from[i][j] = -1;
+            level_to[i][j] = -1;
+        }
+    }
+
+    // Calculate the total number of paths
+    int total_paths = factorial(num_cities - 1);
+
+    // Divide the number of paths among the processors
+    int paths_per_processor = total_paths / num_processors;
+    int remainder = total_paths % num_processors;
+    int start = 0;
+    int end = 0;
+    int processor_counter = 0;
+    for (int i = 0; i < num_cities; i++) {
+        if(start != START_CITIES){
+            for (int j = 0; j < num_processors; j++) {
+                if(processor_counter >= num_processors) {
+                    processor_counter = 0;
+                }
+                level_from[processor_counter][i] = start;
+                if (remainder > 0) {
+                    end = start + paths_per_processor;
+                    remainder--;
+                } else {
+                    end = start + paths_per_processor - 1;
+                }
+                level_to[processor_counter][i] = end;
+                start = end + 1;
+                processor_counter++;
+            }
+        }else{
+            start++;
+        }
+    }
+}
