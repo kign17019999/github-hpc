@@ -54,6 +54,9 @@ void save_result(int rank, int size, double total_computing_time, double sending
 void save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
 double power(double base, int exponent);
 
+int the_best_path_cost=INFINITE;
+int the_best_start;
+
 int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
     
@@ -134,7 +137,13 @@ int main(int argc, char *argv[]) {
             }
             printf("\n");
             printf("      | best_path_cost: %d \n", best_path_cost[index_best_path]);
-    }
+
+            if(the_best_path_cost>best_path_cost[index_best_path]){
+                the_best_path_cost = best_path_cost[index_best_path];
+                the_best_start = START_CITIES;
+            }
+
+        }
 
         double end_time1 = MPI_Wtime();
 
@@ -150,6 +159,8 @@ int main(int argc, char *argv[]) {
             printf("    [ROOT] spent BaB   : %f seconds\n", BaB_computing_time);
             printf("    [ROOT] spent Gather: %f seconds\n", gathering_time);
         }
+
+        if(rank==ROOT) printf("best path cost = %d", the_best_path_cost);
         
         save_result(rank, size, total_computing_time, sending_time, BaB_computing_time, gathering_time, file_path);
 
