@@ -73,8 +73,6 @@ int main(int argc, char *argv[]) {
     init_visited=malloc(sizeof(int[num_init_path][MAX_CITIES]));
     init_path_rank=malloc(num_init_path * sizeof(int));
     path_initiation(path_i, 0, visited_i, 1, size);
-    printf("start city %d \n", START_CITIES);
-    printf("init path: %d %d \n", init_path[0][0], init_path[0][1]);
 
 /*=============================[   2   ]======================================*/
 
@@ -85,7 +83,7 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<num_init_path; i++){
         int rank=init_path_rank[i];
         if(init_path_rank[i]==rank){
-            for(int j=1; j<n; j++){
+            for(int j=0; j<n; j++){
                 path[j] = init_path[i][j];
                 visited[j] = init_visited[i][j];
             }
@@ -103,7 +101,7 @@ int main(int argc, char *argv[]) {
     }
     printf("\n");
     printf("  | Best_path_cost : %d\n", best_path_cost);
-    printf("  | Best_in_rank   : %d\n", best_rank);
+    //printf("  | Best_in_rank   : %d\n", best_rank);
     
     printf("[System] spent total : %f seconds\n", computing_time);
     

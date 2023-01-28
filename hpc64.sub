@@ -80,7 +80,7 @@ module load intel
 ## - change YOUR_EXECUTABLE to your own filename
 ## 
 
-mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a.out -i input/dist13
 
 ## Tidy up the log directory
 ## DO NOT CHANGE THE LINE BELOW

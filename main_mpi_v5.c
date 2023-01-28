@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
             while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
             file_path = myArg;
         }else{
-            char *df_file = "   input/dist4";
+            char *df_file = "input/dist4";
             if(PRINT_DETAIL_is_true==1) if (rank==ROOT) printf("    [ROOT] The default file (%s) will be used if no input is provided  \n", df_file);
             file_path  = df_file;
         }
@@ -179,7 +179,7 @@ int main(int argc, char *argv[]) {
         free(init_cost);
         free(init_visited);
         free(init_path_rank);
-        free(result);
+        if(SAVE_CSV_is_true==1) free(result);
 
         if(LOOP_ALL_FOR_1ST_CITY_is_true==1){
             START_CITIES++;
