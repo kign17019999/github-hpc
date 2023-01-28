@@ -58,10 +58,12 @@ int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
     
     while(1){
+        if(LOOP_ALL_FOR_1ST_CITY_is_true==1) printf("Start with City %d \n", START_CITIES);
+        
         int rank, size;
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
         MPI_Comm_size(MPI_COMM_WORLD, &size);
-        
+
         double start_time1 = MPI_Wtime();
 
         MPI_Request request1, request2;
@@ -78,17 +80,16 @@ int main(int argc, char *argv[]) {
             while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
             file_path = myArg;
         }else{
-            char *df_file = "input/dist4";
-            if (rank==ROOT) printf("[ROOT] The default file (%s) will be used if no input is provided  \n", df_file);
+            char *df_file = "   input/dist4";
+            if (rank==ROOT) printf("    [ROOT] The default file (%s) will be used if no input is provided  \n", df_file);
             file_path  = df_file;
         }
         
 
         if(rank==ROOT){
             get_cities_info(file_path);
-            printf("[ROOT] number of cities = %d \n", n);
-            printf("[ROOT] number of processor = %d \n", size);
-            printf("__version__ == __test__\n");
+            printf("    [ROOT] number of cities = %d \n", n);
+            printf("    [ROOT] number of processor = %d \n", size);
         }
 
         /*send city data to all processor*/
@@ -123,13 +124,13 @@ int main(int argc, char *argv[]) {
                 }
             }
 
-            printf("[ROOT] best of the best is in rank %d, \n", index_best_path);
-            printf("  | best_path: ");
+            printf("    [ROOT] best of the best is in rank %d, \n", index_best_path);
+            printf("      | best_path: ");
             for(int i = 0; i < n ; i++){
                 printf("%d ", best_path[index_best_path][i]);
             }
             printf("\n");
-            printf("  | best_path_cost: %d \n", best_path_cost[index_best_path]);
+            printf("      | best_path_cost: %d \n", best_path_cost[index_best_path]);
     }
 
         double end_time1 = MPI_Wtime();
@@ -141,10 +142,10 @@ int main(int argc, char *argv[]) {
         double BaB_computing_time = end_time3 - start_time3;
         double gathering_time = end_time4 - start_time4;
         if (rank ==ROOT){
-            printf("[ROOT] spent total : %f seconds\n", total_computing_time);
-            printf("[ROOT] spent Send  : %f seconds\n", sending_time);
-            printf("[ROOT] spent BaB   : %f seconds\n", BaB_computing_time);
-            printf("[ROOT] spent Gather: %f seconds\n", gathering_time);
+            printf("    [ROOT] spent total : %f seconds\n", total_computing_time);
+            printf("    [ROOT] spent Send  : %f seconds\n", sending_time);
+            printf("    [ROOT] spent BaB   : %f seconds\n", BaB_computing_time);
+            printf("    [ROOT] spent Gather: %f seconds\n", gathering_time);
         }
         
         save_result(rank, size, total_computing_time, sending_time, BaB_computing_time, gathering_time, file_path);
