@@ -179,7 +179,6 @@ int main(int argc, char *argv[]) {
         free(init_cost);
         free(init_visited);
         free(init_path_rank);
-        if(SAVE_CSV_is_true==1) free(result);
 
         if(LOOP_ALL_FOR_1ST_CITY_is_true==1){
             START_CITIES++;
@@ -472,6 +471,8 @@ void save_result(int rank, int size, double total_computing_time, double sending
         }
         
     }
+
+    free(result);
 }
 
 double power(double base, int exponent) {
