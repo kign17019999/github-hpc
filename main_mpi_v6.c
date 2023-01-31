@@ -13,45 +13,29 @@
 #define LOOP_ALL_FOR_1ST_CITY_is_true 0
 int START_CITIES=9;
 
-// MODE_SEND 0 = send Dist by Bcast
-// MODE_SEND 1 = send Dist by Ibcast
-// MODE_SEND 2 = send Dist by Send & Recv
-// MODE_SEND 3 = send Dist by Isend & Irecv
+/* MODE_SEND 0 = send Dist by Bcast       | MODE_SEND 1 = send Dist by Ibcast
+   MODE_SEND 2 = send Dist by Send & Recv | MODE_SEND 3 = send Dist by Isend & Irecv */
 #define MODE_SEND 0
 
-// MODE_GATHER 0 = gather by Allgather
-// MODE_GATHER 1 = gather by Send & Recv
+/* MODE_GATHER 0 = gather by Allgather | MODE_GATHER 1 = gather by Send & Recv */
 #define MODE_GATHER 0
 
 #define PRINT_DETAIL_is_true 0
-#define SAVE_CSV_is_true 0
+#define SAVE_CSV_is_true 1
 
 //path variable
 int n;
-int (*dist)[MAX_CITIES];
-int (*best_path)[MAX_CITIES];
+int (*dist)[MAX_CITIES], (*best_path)[MAX_CITIES];
 int *best_path_cost;
 
 //city initiation variable
-int (*init_path)[MAX_CITIES];
-int *init_cost;
-int (*init_visited)[MAX_CITIES];
-int *init_path_rank;
-int init_position;
-int init_level;
-int init_rank;
-int num_init_path;
+int (*init_path)[MAX_CITIES], (*init_visited)[MAX_CITIES];
+int *init_cost, *init_path_rank;
+int init_position, init_level, init_rank, num_init_path;
 
 //other variable
 double (*result)[NUM_RESULT];
-double count_bb;
-
-////////////////////////////////////////
-int *path_i;
-int *visited_i;
-int *path;
-int *visited;
-////////////////////////////////////////
+double count_branch_bound;
 
 void get_cities_info(char* file_path);
 void send_data_to_worker(int rank, int size);
@@ -64,11 +48,6 @@ void save_result(int rank, int size, double total_computing_time, double sending
 void save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
 double power(double base, int exponent);
 
-int the_best_path_cost=INFINITE;
-int the_best_start;
-double time_of_the_best;
-int check_best=0;
-
 int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
     
@@ -76,6 +55,11 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     
+    int the_best_path_cost=INFINITE;
+    int the_best_start;
+    double time_of_the_best;
+    int check_best=0;
+
     while(1){
         if(rank==ROOT) printf("start with city = %d\n", START_CITIES);
         if(rank==ROOT){
@@ -119,11 +103,7 @@ int main(int argc, char *argv[]) {
 
         //solving wsp
         double start_time3 = MPI_Wtime();
-        init_position=0;
-        init_level=0;
-        init_rank=0;
-        num_init_path=1;
-        count_bb=0;
+
         do_wsp(rank, size);
         double end_time3 = MPI_Wtime();
 
@@ -296,9 +276,16 @@ void send_data_to_worker(int rank, int size){
 }
 
 void do_wsp(int rank, int size){
+    //set initial value
+    init_position=0;
+    init_level=0;
+    init_rank=0;
+    num_init_path=1;
+    count_branch_bound=0;
+
     //path and visit for initiation
-    path_i = malloc(MAX_CITIES * sizeof(int));
-    visited_i = malloc(MAX_CITIES * sizeof(int));
+    int *path_i = malloc(MAX_CITIES * sizeof(int));
+    int *visited_i = malloc(MAX_CITIES * sizeof(int));
     for(int i=0; i<MAX_CITIES; i++) visited_i[i]=0;
     path_i[0] = START_CITIES;
     visited_i[START_CITIES] = 1;
@@ -312,8 +299,8 @@ void do_wsp(int rank, int size){
     path_initiation(path_i, 0, visited_i, 1, size);    
 
     //path and visit for branch_and_bound
-    path = malloc(MAX_CITIES * sizeof(int));
-    visited = malloc(MAX_CITIES * sizeof(int));
+    int *path = malloc(MAX_CITIES * sizeof(int));
+    int *visited = malloc(MAX_CITIES * sizeof(int));
     for(int i=0; i<num_init_path; i++){
         if(init_path_rank[i]==rank){
             for(int j=0; j<n; j++){
@@ -374,7 +361,7 @@ void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int 
 }
 
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank) {
-    count_bb+=1;
+    count_branch_bound+=1;
     if (level == n) {
 	    if (path_cost < best_path_cost[rank]) {
             best_path_cost[rank] = path_cost;
@@ -457,7 +444,7 @@ void save_result(int rank, int size, double total_computing_time, double sending
     result[rank][1] = sending_time;
     result[rank][2] = BaB_computing_time;
     result[rank][3] = gathering_time;
-    result[rank][4] = count_bb;
+    result[rank][4] = count_branch_bound;
     result[rank][5] = best_path_cost[rank];
     double double_path = power(10, 2*n)*404;
     for(int i=0; i<n; i++){

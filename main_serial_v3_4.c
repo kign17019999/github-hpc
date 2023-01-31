@@ -4,9 +4,9 @@
 #include <time.h>
 #include <string.h>
 
-#define MAX_CITIES 4
+#define MAX_CITIES 20
 #define INFINITE INT_MAX
-#define START_CITIES 0
+#define START_CITIES 9
 
 int n;
 int (*dist)[MAX_CITIES];
@@ -49,12 +49,12 @@ int main(int argc, char *argv[]) {
         while (myArg[strlen(myArg)-1] == '\'') myArg[strlen(myArg)-1] = '\0';;
         file_path = myArg;
     }else{
-        char *df_file = "input/dist4";
+        char *df_file = "input/dist10";
         printf("[System] The default file (%s) will be used if no input is provided  \n", df_file);
         file_path  = df_file;
     }
     get_cities_info(file_path);
-    printf("here2\n");
+    //printf("here2\n");
 /*=============================[   2   ]======================================*/
     int size = 5;
     int *path_i = malloc(MAX_CITIES * sizeof(int));
@@ -64,19 +64,19 @@ int main(int argc, char *argv[]) {
     path_i[0] = START_CITIES;
     visited_i[START_CITIES] = 1;
     level_initiation(size);
-    printf("here3 | n=%d | size=%d\n", n, size);
+    //printf("here3 | n=%d | size=%d\n", n, size);
     //int (*dist)[MAX_CITIES];
 
     // int (*init_path)[MAX_CITIES]=malloc(sizeof(int[num_init_path][MAX_CITIES]));
     // int *init_cost=malloc(num_init_path * sizeof(int));
     // int (*init_visited)[MAX_CITIES]=malloc(sizeof(int[num_init_path][MAX_CITIES]));
-    printf("here4 | num_init_patj=%d | init_level=%d\n", num_init_path, init_level);
+    //printf("here4 | num_init_patj=%d | init_level=%d\n", num_init_path, init_level);
     init_path=malloc(sizeof(int[num_init_path][MAX_CITIES]));
     init_cost=malloc(num_init_path * sizeof(int));
     init_visited=malloc(sizeof(int[num_init_path][MAX_CITIES]));
     init_path_rank=malloc(num_init_path * sizeof(int));
     path_initiation(path_i, 0, visited_i, 1, size);
-    printf("here5\n");
+    //printf("here5\n");
 /*=============================[   2   ]======================================*/
 
     int *path = malloc(MAX_CITIES * sizeof(int));
@@ -113,11 +113,6 @@ int main(int argc, char *argv[]) {
     //printf("  | Best_in_rank   : %d\n", best_rank);
     
     printf("[System] spent total : %f seconds\n", computing_time);
-    
-    //test//
-    for(int i=0; i<size; i++){
-        printf(">>>>>>>>rank:%d | cost=%d\n", i, best_path_cost[i]);
-    }
 
     free(dist);
 
@@ -158,13 +153,13 @@ int get_cities_info(char* file_path) {
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank) {
     //test//
     if(count_bb==0) {
-        printf("rank=%d | path=%d %d %d %d | visited=%d %d %d %d\n", rank, path[0], path[1], path[2], path[3], visited[0], visited[1], visited[2], visited[3]);
+        //printf("rank=%d | path=%d %d %d %d | visited=%d %d %d %d\n", rank, path[0], path[1], path[2], path[3], visited[0], visited[1], visited[2], visited[3]);
         //count_bb++;
     }
     //printf("here7-1\n");
     if (level == n) {
         //printf("here7-2\n");
-        if(count_bb==1) printf("**rank=%d | path=%d %d %d %d | visited=%d %d %d %d\n", rank, path[0], path[1], path[2], path[3], visited[0], visited[1], visited[2], visited[3]);
+        //if(count_bb==1) printf("**rank=%d | path=%d %d %d %d | visited=%d %d %d %d\n", rank, path[0], path[1], path[2], path[3], visited[0], visited[1], visited[2], visited[3]);
         count_bb++;
         if (path_cost < best_path_cost) {
             best_path_cost = path_cost;
@@ -178,12 +173,12 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
                 //printf("here7-4\n");
                 path[level] = i;
                 visited[i] = 1;
-                if(count_bb==0) printf("rank=%d | i=%d | path[3]=%d | visited[x]=%d\n", rank, i, path[level], visited[i]);
+                //if(count_bb==0) printf("rank=%d | i=%d | path[3]=%d | visited[x]=%d\n", rank, i, path[level], visited[i]);
                 //printf("here7-5\n");
                 //printf("path[]: %d\n", path[level - 1]);
                 //printf("i=%d level=%d\n", i, level);
                 if(count_bb==0) {
-                    printf("rank=%d | dist_p_c=%d\n", rank, dist[i][path[level - 1]]);
+                    //printf("rank=%d | dist_p_c=%d\n", rank, dist[i][path[level - 1]]);
                     count_bb++;
                 }
                 int new_cost = path_cost + dist[i][path[level - 1]];
