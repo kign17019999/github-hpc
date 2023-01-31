@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
         double BaB_computing_time = end_time3 - start_time3;
         double gathering_time = end_time4 - start_time4;
         if (rank ==ROOT){
-            if(PRINT_ALL==0) printf("    [ROOT] spent total : %f seconds\n", total_computing_time);
+            if(PRINT_ALL==1) printf("    [ROOT] spent total : %f seconds\n", total_computing_time);
             if(PRINT_ALL==1) printf("    [ROOT] spent Send  : %f seconds\n", sending_time);
             if(PRINT_ALL==1) printf("    [ROOT] spent BaB   : %f seconds\n", BaB_computing_time);
             if(PRINT_ALL==1) printf("    [ROOT] spent Gather: %f seconds\n", gathering_time);
