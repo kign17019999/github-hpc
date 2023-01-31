@@ -1,0 +1,87 @@
+WARNING: release_mt library was used but no multi-ep feature was enabled. Please use release library instead.
+start with city = 0
+    [ROOT] best of the best is in rank 58, 
+      | best_path: 0 9 3 13 14 8 5 10 12 4 7 2 15 1 16 6 11 
+      | best_path_cost: 278 
+    [ROOT] spent total : 55.106724 seconds
+start with city = 1
+    [ROOT] best of the best is in rank 19, 
+      | best_path: 1 15 2 7 4 12 10 5 8 14 13 3 0 9 16 6 11 
+      | best_path_cost: 281 
+    [ROOT] spent total : 42.193827 seconds
+start with city = 2
+    [ROOT] best of the best is in rank 19, 
+      | best_path: 2 15 1 11 6 16 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 267 
+    [ROOT] spent total : 17.450268 seconds
+start with city = 3
+    [ROOT] best of the best is in rank 0, 
+      | best_path: 3 13 14 8 5 10 12 4 7 2 15 1 11 6 16 0 9 
+      | best_path_cost: 286 
+    [ROOT] spent total : 47.687484 seconds
+start with city = 4
+    [ROOT] best of the best is in rank 46, 
+      | best_path: 4 12 10 5 8 14 13 3 0 9 16 7 2 15 1 6 11 
+      | best_path_cost: 290 
+    [ROOT] spent total : 31.717250 seconds
+start with city = 5
+    [ROOT] best of the best is in rank 49, 
+      | best_path: 5 8 10 12 4 7 2 15 1 11 6 16 9 0 3 13 14 
+      | best_path_cost: 291 
+    [ROOT] spent total : 34.939387 seconds
+start with city = 6
+    [ROOT] best of the best is in rank 24, 
+      | best_path: 6 11 2 15 1 16 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 283 
+    [ROOT] spent total : 53.021491 seconds
+start with city = 7
+    [ROOT] best of the best is in rank 6, 
+      | best_path: 7 4 12 10 5 8 14 13 3 0 9 16 6 11 1 15 2 
+      | best_path_cost: 285 
+    [ROOT] spent total : 21.196647 seconds
+start with city = 8
+    [ROOT] best of the best is in rank 19, 
+      | best_path: 8 5 10 12 4 7 2 15 1 11 6 16 9 0 3 13 14 
+      | best_path_cost: 287 
+    [ROOT] spent total : 31.701891 seconds
+start with city = 9
+    [ROOT] best of the best is in rank 2, 
+      | best_path: 9 0 3 13 14 8 5 10 12 4 7 2 15 1 16 6 11 
+      | best_path_cost: 260 
+    [ROOT] spent total : 26.591280 seconds
+start with city = 10
+    [ROOT] best of the best is in rank 18, 
+      | best_path: 10 5 8 14 13 3 0 9 16 7 4 12 2 15 1 6 11 
+      | best_path_cost: 290 
+    [ROOT] spent total : 31.440249 seconds
+start with city = 11
+    [ROOT] best of the best is in rank 40, 
+      | best_path: 11 6 16 1 15 2 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 260 
+    [ROOT] spent total : 18.737557 seconds
+start with city = 12
+    [ROOT] best of the best is in rank 2, 
+      | best_path: 12 4 7 16 6 11 1 15 2 10 5 8 14 13 3 0 9 
+      | best_path_cost: 293 
+    [ROOT] spent total : 27.872026 seconds
+start with city = 13
+    [ROOT] best of the best is in rank 6, 
+      | best_path: 13 14 3 0 9 16 7 4 5 8 10 12 2 15 1 6 11 
+      | best_path_cost: 291 
+    [ROOT] spent total : 49.857288 seconds
+start with city = 14
+    [ROOT] best of the best is in rank 6, 
+      | best_path: 14 13 3 0 9 16 7 4 5 8 10 12 2 15 1 6 11 
+      | best_path_cost: 282 
+    [ROOT] spent total : 47.018128 seconds
+start with city = 15
+    [ROOT] best of the best is in rank 16, 
+      | best_path: 15 1 2 7 4 12 10 5 8 14 13 3 0 9 16 6 11 
+      | best_path_cost: 284 
+    [ROOT] spent total : 32.381779 seconds
+start with city = 16
+    [ROOT] best of the best is in rank 36, 
+      | best_path: 16 6 11 1 15 2 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 276 
+    [ROOT] spent total : 25.349269 seconds
+best path cost = 260 | start with city = 9 | total time = 26.591280 s
