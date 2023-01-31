@@ -60,7 +60,6 @@ int main(int argc, char *argv[]) {
     double time_of_the_best;
 
     while(1){
-        if(rank==ROOT) printf("start with city = %d\n", START_CITIES);
         if(rank==ROOT){
             if(PRINT_ALL==1) printf("====================================================\n");
             if(PRINT_ALL==1) if(LOOP_1ST==1) printf("Start with City %d \n", START_CITIES);
@@ -120,13 +119,13 @@ int main(int argc, char *argv[]) {
                 }
             }
 
-            if(PRINT_ALL==0) printf("    [ROOT] best of the best is in rank %d, \n", index_best_path);
-            if(PRINT_ALL==0) printf("      | best_path: ");
+            if(PRINT_ALL==1) printf("    [ROOT] best of the best is in rank %d, \n", index_best_path);
+            if(PRINT_ALL==1) printf("      | best_path: ");
             for(int i = 0; i < n ; i++){
-                if(PRINT_ALL==0) printf("%d ", best_path[index_best_path][i]);
+                if(PRINT_ALL==1) printf("%d ", best_path[index_best_path][i]);
             }
-            if(PRINT_ALL==0) printf("\n");
-            if(PRINT_ALL==0) printf("      | best_path_cost: %d \n", best_path_cost[index_best_path]);
+            if(PRINT_ALL==1) printf("\n");
+            if(PRINT_ALL==1) printf("      | best_path_cost: %d \n", best_path_cost[index_best_path]);
 
             if(the_best_path_cost>best_path_cost[index_best_path]){
                 the_best_path_cost = best_path_cost[index_best_path];
