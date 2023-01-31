@@ -1,0 +1,28 @@
+WARNING: release_mt library was used but no multi-ep feature was enabled. Please use release library instead.
+    [ROOT] spent total : 5.780825 seconds
+best path cost = 250 | start with city = 2 | total time = 5.780825 s
+[s388240@crescent-login2 github-hpc]$ mpicc main_mpi_v6.c
+[s388240@crescent-login2 github-hpc]$ mpirun -n 16 ./a.out -i input/dist16
+WARNING: release_mt library was used but no multi-ep feature was enabled. Please use release library instead.
+>>>>>> no check print
+best path cost = 250 | start with city = 2 | total time = 6.246026 s
+[s388240@crescent-login2 github-hpc]$ mpirun -n 16 ./a.out -i input/dist16
+WARNING: release_mt library was used but no multi-ep feature was enabled. Please use release library instead.
+>>>>>> no check print
+best path cost = 250 | start with city = 2 | total time = 5.819630 s
+[s388240@crescent-login2 github-hpc]$ mpicc main_mpi_v6.c
+[s388240@crescent-login2 github-hpc]$ mpirun -n 16 ./a.out -i input/dist16
+WARNING: release_mt library was used but no multi-ep feature was enabled. Please use release library instead.
+>>>>>> no check print
+>>>>>> delete count bb
+best path cost = 250 | start with city = 2 | total time = 5.654040 s
+[s388240@crescent-login2 github-hpc]$ mpirun -n 16 ./a.out -i input/dist16
+WARNING: release_mt library was used but no multi-ep feature was enabled. Please use release library instead.
+>>>>>> no check print
+>>>>>> delete count bb
+best path cost = 250 | start with city = 2 | total time = 5.562874 s
+[s388240@crescent-login2 github-hpc]$ mpirun -n 16 ./a.out -i input/dist16
+WARNING: release_mt library was used but no multi-ep feature was enabled. Please use release library instead.
+>>>>>> no check print
+>>>>>> delete count bb
+best path cost = 250 | start with city = 2 | total time = 5.598400 s

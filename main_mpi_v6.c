@@ -9,7 +9,7 @@
 #define INFINITE INT_MAX
 #define ROOT 0
 
-#define LOOP_1ST 0 //Loop all of start possible start city
+#define LOOP_1ST 0 ////set 1 to eneble loop all
 int START_CITIES=9;
 
 /* MODE_SEND 0 = send Dist by Bcast       | MODE_SEND 1 = send Dist by Ibcast
@@ -19,7 +19,7 @@ int START_CITIES=9;
 /* MODE_GATHER 0 = gather by Allgather | MODE_GATHER 1 = gather by Send & Recv */
 #define MODE_GATHER 0
 
-#define PRINT_ALL 0
+#define PRINT_ALL 0 //set 1 to eneble print all
 #define SAVE_CSV 1
 #define NUM_RESULT 7
 
@@ -35,6 +35,8 @@ int init_position, init_level, init_rank, num_init_path;
 
 //other variable
 double (*result)[NUM_RESULT];
+
+#define NUM_BRA_BOU 0 //set 1 to eneble print all
 double count_branch_bound;
 
 void get_cities_info(char* file_path);
@@ -342,7 +344,7 @@ void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int 
 }
 
 void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank) {
-    count_branch_bound+=1;
+    if(NUM_BRA_BOU==1) count_branch_bound+=1;
     if (level == n) {
 	    if (path_cost < best_path_cost[rank]) {
             best_path_cost[rank] = path_cost;
