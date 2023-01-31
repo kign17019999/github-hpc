@@ -382,7 +382,7 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
         for(int i=0; i<size;i++){
             if(i!=rank){
                 global_flag=0;
-                MPI_Test(global_request_Irecv[i], &global_flag, MPI_STATUS_IGNORE);
+                MPI_Test(&global_request_Irecv[i], &global_flag, MPI_STATUS_IGNORE);
                 if(global_flag){
                     if(incoming_cost < all_best_cost) all_best_cost = incoming_cost;
                     MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv[i]);
