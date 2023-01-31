@@ -41,8 +41,8 @@ double count_branch_bound;
 
 ////////////////
 int all_best_cost;
-int *global_request_Isend;
-int *global_request_Irecv;
+MPI_Request *global_request_Isend;
+MPI_Request *global_request_Irecv;
 int incoming_cost;
 int global_flag;
 ///////////////
@@ -307,9 +307,9 @@ void do_wsp(int rank, int size){
     global_request_Irecv = malloc(sizeof(int[size]));
     for(int i=0; i<size; i++){
         if(i!=rank){
-            MPI_Request request_Isend, request_Irecv;
-            global_request_Isend[i] = request_Isend;
-            global_request_Irecv[i] = request_Irecv;
+            // MPI_Request request_Isend, request_Irecv;
+            // global_request_Isend[i] = request_Isend;
+            // global_request_Irecv[i] = request_Irecv;
             MPI_Isend(&all_best_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Isend[i]);
             MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv[i]);
 
