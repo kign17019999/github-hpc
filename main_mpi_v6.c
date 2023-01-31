@@ -60,6 +60,7 @@ int main(int argc, char *argv[]) {
     int the_best_path_cost=INFINITE;
     int the_best_start, check_best=0;
     double time_of_the_best;
+    int *the_best_path = malloc(sizeof(int[MAX_CITIES]));;
 
     while(1){
         if(rank==ROOT){
@@ -132,6 +133,7 @@ int main(int argc, char *argv[]) {
             if(the_best_path_cost>best_path_cost[index_best_path]){
                 the_best_path_cost = best_path_cost[index_best_path];
                 the_best_start = START_CITIES;
+                for(int i=0; i<n; i++) the_best_path[i]=best_path[index_best_path][i];
                 check_best=1;
             }
 
@@ -170,7 +172,11 @@ int main(int argc, char *argv[]) {
         }else break;
     }
 
-    if(rank==ROOT) printf("best path cost = %d | start with city = %d | total time = %f s\n", the_best_path_cost, the_best_start, time_of_the_best);
+    if(rank==ROOT){
+        printf("best path cost = %d | total time = %f s | path = ", the_best_path_cost, time_of_the_best);
+        for(int i=0; i<n; i++) printf("%d ", the_best_path[i]);
+        printf("\n");
+    }
     
     MPI_Finalize();
     return 0;
