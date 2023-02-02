@@ -10,7 +10,7 @@
 #define ROOT 0
 
 #define LOOP_1ST 1 ////set 1 to eneble loop all
-int START_CITIES=0;
+int START_CITIES=0; //start with 0 to n-1
 
 /* MODE_SEND 0 = send Dist by Bcast       | MODE_SEND 1 = send Dist by Ibcast
    MODE_SEND 2 = send Dist by Send & Recv | MODE_SEND 3 = send Dist by Isend & Irecv */
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
 
             if(the_best_path_bound>best_path_bound[index_best_path]){
                 the_best_path_bound = best_path_bound[index_best_path];
-                the_best_start = START_CITIES-1;
+                the_best_start = START_CITIES;
                 for(int i=0; i<n; i++) the_best_path[i]=best_path[index_best_path][i];
                 check_best=1;
             }
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
         
         if(LOOP_1ST==1){
             START_CITIES++;
-            if(START_CITIES-1==n) break;
+            if(START_CITIES==n) break;
         }else break;
     }
 
@@ -286,14 +286,14 @@ void do_wsp(int rank, int size){
     //set initial value
     init_position = init_level = init_rank = count_branch_bound = 0;
     num_init_path=1;
-    if(START_CITIES-1>=n) START_CITIES=1;
+    if(START_CITIES>=n) START_CITIES=0;
 
     //path and visit for initiation
     int *path_i = malloc(MAX_CITIES * sizeof(int));
     int *visited_i = malloc(MAX_CITIES * sizeof(int));
     for(int i=0; i<MAX_CITIES; i++) visited_i[i]=0;
-    path_i[0] = START_CITIES-1;
-    visited_i[START_CITIES-1] = 1;
+    path_i[0] = START_CITIES;
+    visited_i[START_CITIES] = 1;
     level_initiation(size);
 
     //path initiation

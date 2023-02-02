@@ -6,7 +6,7 @@
 
 #define MAX_CITIES 20
 #define INFINITE INT_MAX
-#define START_CITIES 9 //start with 1
+#define START_CITIES 9 //start with 0 to n-1
 
 int n;
 int (*dist)[MAX_CITIES];
@@ -43,16 +43,16 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<MAX_CITIES; i++) visited[i]=0;
     
     // set starter city to city 1 (or 0 in array order) in path array at position 0
-    path[0] = START_CITIES-1;
+    path[0] = START_CITIES;
 
     // set visited city to 1 by setting visited array position 0 to 1
-    visited[START_CITIES-1] = 1;
+    visited[START_CITIES] = 1;
 
     branch_and_bound(path, 0, visited, 1);
     
     double computing_time = (double)(clock() - start) / CLOCKS_PER_SEC;
 
-    printf("best_path_bound = %d | total_time = %f s | path = ", best_path_bound, computing_time);
+    printf("best path bound = %d | total time = %f s | path = ", best_path_bound, computing_time);
     for(int i=0; i<n; i++) printf("%d ", best_path[i]);
     printf("| Mode = Serial");
     printf("\n");
