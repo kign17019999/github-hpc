@@ -10,7 +10,7 @@
 #define ROOT 0
 
 #define LOOP_1ST 0 ////set 1 to eneble loop all
-int START_CITIES=0;
+int START_CITIES=0; //start with 0 to n-1
 
 /* MODE_SEND 0 = send Dist by Bcast       | MODE_SEND 1 = send Dist by Ibcast
    MODE_SEND 2 = send Dist by Send & Recv | MODE_SEND 3 = send Dist by Isend & Irecv */
@@ -19,18 +19,18 @@ int START_CITIES=0;
 /* MODE_GATHER 0 = gather by Allgather | MODE_GATHER 1 = gather by Send & Recv */
 #define MODE_GATHER 0
 
-#define PRINT_ALL 1 //set 1 to eneble print all
+#define PRINT_ALL 0 //set 1 to eneble print all
 #define SAVE_CSV 1
 #define NUM_RESULT 7
 
 //path variable
 int n;
 int (*dist)[MAX_CITIES], (*best_path)[MAX_CITIES];
-int *best_path_cost;
+int *best_path_bound;
 
 //city initiation variable
 int (*init_path)[MAX_CITIES], (*init_visited)[MAX_CITIES];
-int *init_cost, *init_path_rank;
+int *init_bound, *init_path_rank;
 int init_position, init_level, init_rank, num_init_path;
 
 //other variable
@@ -42,12 +42,12 @@ double count_branch_bound;
 void get_cities_info(char* file_path);
 void send_data_to_worker(int rank, int size);
 void do_wsp(int rank, int size);
-void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size);
+void path_initiation(int *path_i, int path_bound, int *visited_i, int level, int size);
 void level_initiation(int size);
-void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
+void branch_and_bound(int *path, int path_bound, int *visited, int level, int rank);
 void gather_result(int rank, int size);
 void save_result(int rank, int size, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, char* file_path);
-void save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
+void save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_bound, double r_best_path);
 double power(double base, int exponent);
 
 int main(int argc, char *argv[]) {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     
-    int the_best_path_cost=INFINITE;
+    int the_best_path_bound=INFINITE;
     int the_best_start, check_best=0;
     double time_of_the_best;
     int *the_best_path = malloc(sizeof(int[MAX_CITIES]));;
@@ -75,8 +75,8 @@ int main(int argc, char *argv[]) {
         //allocation path variable
         dist = malloc(sizeof(int[MAX_CITIES][MAX_CITIES]));
         best_path = malloc(sizeof(int[size][MAX_CITIES]));
-        best_path_cost = malloc(sizeof(int[size]));
-        best_path_cost[rank] = INFINITE;
+        best_path_bound = malloc(sizeof(int[size]));
+        best_path_bound[rank] = INFINITE;
 
         char* file_path;
         if(argc >=3 && strcmp("-i", argv[1]) == 0){
@@ -116,9 +116,9 @@ int main(int argc, char *argv[]) {
             int min_dist=INFINITE;
             int index_best_path;
             for(int i=0; i<size; i++){            
-                if(best_path_cost[i]<min_dist){
+                if(best_path_bound[i]<min_dist){
                     index_best_path = i;
-                    min_dist = best_path_cost[i];
+                    min_dist = best_path_bound[i];
                 }
             }
 
@@ -128,10 +128,10 @@ int main(int argc, char *argv[]) {
                 if(PRINT_ALL==1) printf("%d ", best_path[index_best_path][i]);
             }
             if(PRINT_ALL==1) printf("\n");
-            if(PRINT_ALL==1) printf("      | best_path_cost: %d \n", best_path_cost[index_best_path]);
+            if(PRINT_ALL==1) printf("      | best_path_bound: %d \n", best_path_bound[index_best_path]);
 
-            if(the_best_path_cost>best_path_cost[index_best_path]){
-                the_best_path_cost = best_path_cost[index_best_path];
+            if(the_best_path_bound>best_path_bound[index_best_path]){
+                the_best_path_bound = best_path_bound[index_best_path];
                 the_best_start = START_CITIES;
                 for(int i=0; i<n; i++) the_best_path[i]=best_path[index_best_path][i];
                 check_best=1;
@@ -160,9 +160,9 @@ int main(int argc, char *argv[]) {
      
         free(dist);
         free(best_path);
-        free(best_path_cost);
+        free(best_path_bound);
         free(init_path);
-        free(init_cost);
+        free(init_bound);
         free(init_visited);
         free(init_path_rank);
         
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
     }
 
     if(rank==ROOT){
-        printf("best path cost = %d | total time = %f s | path = ", the_best_path_cost, time_of_the_best);
+        printf("best path bound = %d | total time = %f s | path = ", the_best_path_bound, time_of_the_best);
         for(int i=0; i<n; i++) printf("%d ", the_best_path[i]);
         printf("| RT = FALSE");
         printf("\n");
@@ -290,7 +290,7 @@ void do_wsp(int rank, int size){
 
     //path initiation
     init_path=malloc(sizeof(int[num_init_path][MAX_CITIES]));
-    init_cost=malloc(num_init_path * sizeof(int));
+    init_bound=malloc(num_init_path * sizeof(int));
     init_visited=malloc(sizeof(int[num_init_path][MAX_CITIES]));
     init_path_rank=malloc(num_init_path * sizeof(int));
     path_initiation(path_i, 0, visited_i, 1, size);    
@@ -304,7 +304,7 @@ void do_wsp(int rank, int size){
                 path[j] = init_path[i][j];
                 visited[j] = init_visited[i][j];
             }
-            branch_and_bound(path, init_cost[i], visited, init_level, rank);
+            branch_and_bound(path, init_bound[i], visited, init_level, rank);
         }
         
     }
@@ -326,13 +326,13 @@ void level_initiation(int size){
     }
 }
 
-void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size) {
+void path_initiation(int *path_i, int path_bound, int *visited_i, int level, int size) {
     if (level == init_level) {
         for(int i=0; i<n; i++){
             init_path[init_position][i] = path_i[i];
             init_visited[init_position][i] = visited_i[i];
         }
-        init_cost[init_position]=path_cost;
+        init_bound[init_position]=path_bound;
         init_path_rank[init_position]=init_rank;
         init_position++;
 
@@ -343,28 +343,28 @@ void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int 
             if (!visited_i[i]) {
                 path_i[level] = i;
                 visited_i[i] = 1;
-                int new_cost = path_cost + dist[i][path_i[level - 1]];
-                path_initiation(path_i, new_cost, visited_i, level + 1, size);
+                int new_bound = path_bound + dist[i][path_i[level - 1]];
+                path_initiation(path_i, new_bound, visited_i, level + 1, size);
                 visited_i[i] = 0;
             }
         }
     }
 }
 
-void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank) {
+void branch_and_bound(int *path, int path_bound, int *visited, int level, int rank) {
     if(NUM_BRA_BOU==1) count_branch_bound+=1;
     if (level == n) {
-	    if (path_cost < best_path_cost[rank]) {
-            best_path_cost[rank] = path_cost;
-            for (int i = 0; i < n; i++) best_path[rank][i] = path[i];
+	    if (path_bound < best_path_bound[rank]) {
+            best_path_bound[rank] = path_bound;
+            for (int i = 0; i < n; i++) best_path[rank][i] = path[i]+1;
         }
     } else {
         for (int i = 0; i < n; i++) {
             if (!visited[i]) {
                 path[level] = i;
                 visited[i] = 1;
-                int new_cost = path_cost + dist[i][path[level - 1]];
-            if (new_cost < best_path_cost[rank]) branch_and_bound(path, new_cost, visited, level + 1, rank);
+                int new_bound = path_bound + dist[i][path[level - 1]];
+            if (new_bound < best_path_bound[rank]) branch_and_bound(path, new_bound, visited, level + 1, rank);
             visited[i] = 0;
 	        }
         }
@@ -372,7 +372,7 @@ void branch_and_bound(int *path, int path_cost, int *visited, int level, int ran
 }
 
 void gather_result(int rank, int size){
-    int send_buf_cost = best_path_cost[rank];
+    int send_buf_bound = best_path_bound[rank];
     int row_to_gather[MAX_CITIES];
     for (int i = 0; i < MAX_CITIES; i++) {
         row_to_gather[i] = best_path[rank][i];
@@ -381,21 +381,21 @@ void gather_result(int rank, int size){
     if(MODE_GATHER==0){
         // MODE_GATHER 0 = gather by Allgather
         if(rank==ROOT) if(PRINT_ALL==1) printf("    ROOT] MODE_GATHER = 0 (gather by Allgather) \n");
-        MPI_Allgather(&send_buf_cost, 1, MPI_INT, best_path_cost, 1, MPI_INT, MPI_COMM_WORLD);
+        MPI_Allgather(&send_buf_bound, 1, MPI_INT, best_path_bound, 1, MPI_INT, MPI_COMM_WORLD);
         MPI_Allgather(&row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
     }else if(MODE_GATHER==1){
         // MODE_GATHER 1 = gather by Send & Recv
         if(rank==ROOT){
             if(PRINT_ALL==1) printf("    [ROOT] MODE_GATHER = 1 (gather by Send & Recv) \n");
             for(int i=1; i<size; i++){
-                MPI_Recv(&best_path_cost[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Recv(&best_path_bound[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             }
             for(int i=1; i<size; i++){
                 MPI_Recv(&row_to_gather, MAX_CITIES, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                 for(int j=0; j<n; j++) best_path[i][j]=row_to_gather[j];
             }
         }else{
-            MPI_Send(&send_buf_cost, 1, MPI_INT, ROOT, 0, MPI_COMM_WORLD);
+            MPI_Send(&send_buf_bound, 1, MPI_INT, ROOT, 0, MPI_COMM_WORLD);
             MPI_Send(&row_to_gather, MAX_CITIES, MPI_INT, ROOT, 0, MPI_COMM_WORLD);
         }
     }    
@@ -409,7 +409,7 @@ void save_result(int rank, int size, double total_computing_time, double sending
     result[rank][2] = BaB_computing_time;
     result[rank][3] = gathering_time;
     result[rank][4] = count_branch_bound;
-    result[rank][5] = best_path_cost[rank];
+    result[rank][5] = best_path_bound[rank];
     double double_path = power(10, 2*n)*404;
     for(int i=0; i<n; i++){
         double_path+=power(10, (n-i-1)*2)*best_path[rank][i];
@@ -429,7 +429,7 @@ void save_result(int rank, int size, double total_computing_time, double sending
     free(result);
 }
 
-void save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path) {
+void save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_bound, double r_best_path) {
     FILE *file;
     char date[20];
     time_t t = time(NULL);
@@ -439,7 +439,7 @@ void save_result_csv(double index_time, int rank, char *dist_file, double total_
     file = fopen(fileName, "r"); // open the file in "read" mode
     if (file == NULL) {
         file = fopen(fileName, "w"); //create new file in "write" mode
-        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), sending_time (s), BaB_computing_time (s), gathering_time (s), count_BaB, best_cost, best_path, MODE_SEND, MODE_GATHER\n"); // add header to the file
+        fprintf(file, "index_time, rank, date-time, dist file, total_computing_time (s), sending_time (s), BaB_computing_time (s), gathering_time (s), count_BaB, best_bound, best_path, MODE_SEND, MODE_GATHER\n"); // add header to the file
     } else {
         fclose(file);
         file = fopen(fileName, "a"); // open the file in "append" mode
@@ -447,7 +447,7 @@ void save_result_csv(double index_time, int rank, char *dist_file, double total_
 
     // Get the current date and time
     strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", &tm);
-    fprintf(file, "%f, %d, %s, %s, %f, %f, %f, %f, %f, %f, %f, %d, %d\n", index_time, rank, date, dist_file, total_computing_time, sending_time, BaB_computing_time, gathering_time, count_bab, r_best_cost, r_best_path, MODE_SEND, MODE_GATHER); // add new data to the file
+    fprintf(file, "%f, %d, %s, %s, %f, %f, %f, %f, %f, %f, %f, %d, %d\n", index_time, rank, date, dist_file, total_computing_time, sending_time, BaB_computing_time, gathering_time, count_bab, r_best_bound, r_best_path, MODE_SEND, MODE_GATHER); // add new data to the file
 
     fclose(file); // close the file
 }
