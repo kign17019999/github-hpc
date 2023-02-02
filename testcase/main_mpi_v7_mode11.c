@@ -19,7 +19,7 @@ int START_CITIES=0; //start with 0 to n-1
 /* MODE_GATHER 0 = gather by Allgather | MODE_GATHER 1 = gather by Send & Recv */
 #define MODE_GATHER 1
 
-#define PRINT_ALL 9 //set 1 to eneble print all
+#define PRINT_ALL 0 //set 1 to eneble print all
 #define SAVE_CSV 1
 #define NUM_RESULT 7
 
