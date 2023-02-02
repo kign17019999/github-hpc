@@ -9,7 +9,7 @@
 #define INFINITE INT_MAX
 #define ROOT 0
 
-#define LOOP_1ST 1 ////set 1 to eneble loop all
+#define LOOP_1ST 0 ////set 1 to eneble loop all
 int START_CITIES=0;
 
 /* MODE_SEND 0 = send Dist by Bcast       | MODE_SEND 1 = send Dist by Ibcast
@@ -175,9 +175,7 @@ int main(int argc, char *argv[]) {
     if(rank==ROOT){
         printf("best path cost = %d | total time = %f s | path = ", the_best_path_cost, time_of_the_best);
         for(int i=0; i<n; i++) printf("%d ", the_best_path[i]);
-        /////////////////////////////
         printf("| RT = FALSE");
-        /////////////////////////////
         printf("\n");
     }
     
