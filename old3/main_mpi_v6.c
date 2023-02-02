@@ -39,20 +39,12 @@ double (*result)[NUM_RESULT];
 #define NUM_BRA_BOU 0 //set 1 to eneble print all
 double count_branch_bound;
 
-////////////////
-int all_best_cost;
-MPI_Request *global_request_Isend;
-MPI_Request *global_request_Irecv;
-int incoming_cost;
-int global_flag;
-///////////////
-
 void get_cities_info(char* file_path);
 void send_data_to_worker(int rank, int size);
 void do_wsp(int rank, int size);
 void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int size);
 void level_initiation(int size);
-void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank, int size);
+void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank);
 void gather_result(int rank, int size);
 void save_result(int rank, int size, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, char* file_path);
 void save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_cost, double r_best_path);
@@ -285,6 +277,7 @@ void do_wsp(int rank, int size){
     //set initial value
     init_position = init_level = init_rank = count_branch_bound = 0;
     num_init_path=1;
+    if(START_CITIES>=n) START_CITIES=0;
 
     //path and visit for initiation
     int *path_i = malloc(MAX_CITIES * sizeof(int));
@@ -301,23 +294,6 @@ void do_wsp(int rank, int size){
     init_path_rank=malloc(num_init_path * sizeof(int));
     path_initiation(path_i, 0, visited_i, 1, size);    
 
-    //////////////////////////////////////
-    all_best_cost = INFINITE;
-    global_request_Isend = malloc(size * sizeof(MPI_Request));
-    global_request_Irecv = malloc(size * sizeof(MPI_Request));
-    for(int i=0; i<size; i++){
-        if(i!=rank){
-            // MPI_Request request_Isend, request_Irecv;
-            // global_request_Isend[i] = request_Isend;
-            // global_request_Irecv[i] = request_Irecv;
-            MPI_Isend(&all_best_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Isend[i]);
-            MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv[i]);
-
-        }
-    }
-
-    //////////////////////////////////////
-
     //path and visit for branch_and_bound
     int *path = malloc(MAX_CITIES * sizeof(int));
     int *visited = malloc(MAX_CITIES * sizeof(int));
@@ -327,8 +303,7 @@ void do_wsp(int rank, int size){
                 path[j] = init_path[i][j];
                 visited[j] = init_visited[i][j];
             }
-            //branch_and_bound(path, init_cost[i], visited, init_level, rank);
-            branch_and_bound(path, init_cost[i], visited, init_level, rank, size);        
+            branch_and_bound(path, init_cost[i], visited, init_level, rank);
         }
         
     }
@@ -375,45 +350,20 @@ void path_initiation(int *path_i, int path_cost, int *visited_i, int level, int 
     }
 }
 
-void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank, int size) {
+void branch_and_bound(int *path, int path_cost, int *visited, int level, int rank) {
     if(NUM_BRA_BOU==1) count_branch_bound+=1;
     if (level == n) {
-        ////////////////////////////
-        for(int i=0; i<size;i++){
-            if(i!=rank){
-                global_flag=0;
-                MPI_Test(&global_request_Irecv[i], &global_flag, MPI_STATUS_IGNORE);
-                if(global_flag){
-                    if(incoming_cost < all_best_cost) all_best_cost = incoming_cost;
-                    MPI_Irecv(&incoming_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv[i]);
-                }
-            }
-        }
-	    // if (path_cost < best_path_cost[rank]) {
-        //     best_path_cost[rank] = path_cost;
-        //     for (int i = 0; i < n; i++) best_path[rank][i] = path[i];
-        // }
-        ////////////////////////////
-        if (path_cost < all_best_cost) {
+	    if (path_cost < best_path_cost[rank]) {
             best_path_cost[rank] = path_cost;
-            all_best_cost = path_cost;
-            for(int i = 0; i < n; i++) best_path[rank][i] = path[i];
-            for(int i = 0; i < size; i++) {
-                if(i != rank) {
-                    MPI_Cancel(&global_request_Isend[i]);
-                    MPI_Isend(&all_best_cost, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Isend[i]);
-                }
-            }
+            for (int i = 0; i < n; i++) best_path[rank][i] = path[i];
         }
-        ////////////////////////////
     } else {
         for (int i = 0; i < n; i++) {
             if (!visited[i]) {
                 path[level] = i;
                 visited[i] = 1;
                 int new_cost = path_cost + dist[i][path[level - 1]];
-            //if (new_cost < best_path_cost[rank]) branch_and_bound(path, new_cost, visited, level + 1, rank);
-            if (new_cost < best_path_cost[rank]) branch_and_bound(path, new_cost, visited, level + 1, rank, size);
+            if (new_cost < best_path_cost[rank]) branch_and_bound(path, new_cost, visited, level + 1, rank);
             visited[i] = 0;
 	        }
         }

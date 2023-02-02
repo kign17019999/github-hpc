@@ -1,0 +1,446 @@
+WARNING: release_mt library was used but no multi-ep feature was enabled. Please use release library instead.
+====================================================
+Start with City 0 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 58, 
+      | best_path: 0 9 3 13 14 8 5 10 12 4 7 2 15 1 16 6 11 
+      | best_path_cost: 278 
+    [ROOT] spent total : 25.928215 seconds
+    [ROOT] spent Send  : 0.002484 seconds
+    [ROOT] spent BaB   : 25.101209 seconds
+    [ROOT] spent Gather: 0.820428 seconds
+====================================================
+Start with City 1 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 19, 
+      | best_path: 1 15 2 7 4 12 10 5 8 14 13 3 0 9 16 6 11 
+      | best_path_cost: 281 
+    [ROOT] spent total : 10.883612 seconds
+    [ROOT] spent Send  : 0.000081 seconds
+    [ROOT] spent BaB   : 1.581154 seconds
+    [ROOT] spent Gather: 9.300797 seconds
+====================================================
+Start with City 2 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 19, 
+      | best_path: 2 15 1 11 6 16 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 267 
+    [ROOT] spent total : 6.720683 seconds
+    [ROOT] spent Send  : 0.000073 seconds
+    [ROOT] spent BaB   : 1.207287 seconds
+    [ROOT] spent Gather: 5.511377 seconds
+====================================================
+Start with City 3 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 0, 
+      | best_path: 3 13 14 8 5 10 12 4 7 2 15 1 11 6 16 0 9 
+      | best_path_cost: 286 
+    [ROOT] spent total : 16.656693 seconds
+    [ROOT] spent Send  : 0.000074 seconds
+    [ROOT] spent BaB   : 7.576904 seconds
+    [ROOT] spent Gather: 9.078398 seconds
+====================================================
+Start with City 4 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 46, 
+      | best_path: 4 12 10 5 8 14 13 3 0 9 16 7 2 15 1 6 11 
+      | best_path_cost: 290 
+    [ROOT] spent total : 8.586261 seconds
+    [ROOT] spent Send  : 0.000080 seconds
+    [ROOT] spent BaB   : 2.284587 seconds
+    [ROOT] spent Gather: 6.299762 seconds
+====================================================
+Start with City 5 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 49, 
+      | best_path: 5 8 10 12 4 7 2 15 1 11 6 16 9 0 3 13 14 
+      | best_path_cost: 291 
+    [ROOT] spent total : 12.943298 seconds
+    [ROOT] spent Send  : 0.000097 seconds
+    [ROOT] spent BaB   : 8.783323 seconds
+    [ROOT] spent Gather: 4.157478 seconds
+====================================================
+Start with City 6 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 36, 
+      | best_path: 6 11 16 1 15 2 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 288 
+    [ROOT] spent total : 19.787124 seconds
+    [ROOT] spent Send  : 0.000080 seconds
+    [ROOT] spent BaB   : 1.657641 seconds
+    [ROOT] spent Gather: 18.128192 seconds
+====================================================
+Start with City 7 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 6, 
+      | best_path: 7 4 12 10 5 8 14 13 3 0 9 16 6 11 1 15 2 
+      | best_path_cost: 285 
+    [ROOT] spent total : 8.921143 seconds
+    [ROOT] spent Send  : 0.000073 seconds
+    [ROOT] spent BaB   : 4.314703 seconds
+    [ROOT] spent Gather: 4.604922 seconds
+====================================================
+Start with City 8 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 19, 
+      | best_path: 8 5 10 12 4 7 2 15 1 11 6 16 9 0 3 13 14 
+      | best_path_cost: 287 
+    [ROOT] spent total : 13.053112 seconds
+    [ROOT] spent Send  : 0.000068 seconds
+    [ROOT] spent BaB   : 3.996045 seconds
+    [ROOT] spent Gather: 9.055549 seconds
+====================================================
+Start with City 9 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 2, 
+      | best_path: 9 0 3 13 14 8 5 10 12 4 7 2 15 1 16 6 11 
+      | best_path_cost: 260 
+    [ROOT] spent total : 13.543312 seconds
+    [ROOT] spent Send  : 0.000099 seconds
+    [ROOT] spent BaB   : 2.109363 seconds
+    [ROOT] spent Gather: 11.432387 seconds
+====================================================
+Start with City 10 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 41, 
+      | best_path: 10 12 4 5 8 14 13 3 0 9 16 7 2 15 1 6 11 
+      | best_path_cost: 295 
+    [ROOT] spent total : 15.235590 seconds
+    [ROOT] spent Send  : 0.000069 seconds
+    [ROOT] spent BaB   : 6.701247 seconds
+    [ROOT] spent Gather: 8.532192 seconds
+====================================================
+Start with City 11 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 40, 
+      | best_path: 11 6 16 1 15 2 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 260 
+    [ROOT] spent total : 8.261629 seconds
+    [ROOT] spent Send  : 0.000070 seconds
+    [ROOT] spent BaB   : 2.132024 seconds
+    [ROOT] spent Gather: 6.128156 seconds
+====================================================
+Start with City 12 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 39, 
+      | best_path: 12 16 6 11 1 15 2 7 4 10 5 8 14 13 3 0 9 
+      | best_path_cost: 311 
+    [ROOT] spent total : 8.063801 seconds
+    [ROOT] spent Send  : 0.000068 seconds
+    [ROOT] spent BaB   : 1.541628 seconds
+    [ROOT] spent Gather: 6.520906 seconds
+====================================================
+Start with City 13 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 39, 
+      | best_path: 13 16 6 11 1 15 2 7 4 12 10 5 8 14 3 0 9 
+      | best_path_cost: 322 
+    [ROOT] spent total : 23.994238 seconds
+    [ROOT] spent Send  : 0.000096 seconds
+    [ROOT] spent BaB   : 0.347578 seconds
+    [ROOT] spent Gather: 23.645185 seconds
+====================================================
+Start with City 14 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 6, 
+      | best_path: 14 13 3 0 9 16 7 4 5 8 10 12 2 15 1 6 11 
+      | best_path_cost: 282 
+    [ROOT] spent total : 19.384905 seconds
+    [ROOT] spent Send  : 0.000072 seconds
+    [ROOT] spent BaB   : 14.265078 seconds
+    [ROOT] spent Gather: 5.118349 seconds
+====================================================
+Start with City 15 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 16, 
+      | best_path: 15 1 2 7 4 12 10 5 8 14 13 3 0 9 16 6 11 
+      | best_path_cost: 284 
+    [ROOT] spent total : 11.159479 seconds
+    [ROOT] spent Send  : 0.000068 seconds
+    [ROOT] spent BaB   : 3.996824 seconds
+    [ROOT] spent Gather: 7.160964 seconds
+====================================================
+Start with City 16 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 36, 
+      | best_path: 16 6 11 1 15 2 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 276 
+    [ROOT] spent total : 12.290904 seconds
+    [ROOT] spent Send  : 0.000061 seconds
+    [ROOT] spent BaB   : 4.758034 seconds
+    [ROOT] spent Gather: 7.531239 seconds
+best path cost = 260 | total time = 13.543312 s | path = 9 0 3 13 14 8 5 10 12 4 7 2 15 1 16 6 11 | RT = TRUE
+WARNING: release_mt library was used but no multi-ep feature was enabled. Please use release library instead.
+====================================================
+Start with City 0 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 58, 
+      | best_path: 0 9 3 13 14 8 5 10 12 4 7 2 15 1 16 6 11 
+      | best_path_cost: 278 
+    [ROOT] spent total : 57.145930 seconds
+    [ROOT] spent Send  : 0.001649 seconds
+    [ROOT] spent BaB   : 31.041525 seconds
+    [ROOT] spent Gather: 26.098446 seconds
+====================================================
+Start with City 1 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 19, 
+      | best_path: 1 15 2 7 4 12 10 5 8 14 13 3 0 9 16 6 11 
+      | best_path_cost: 281 
+    [ROOT] spent total : 36.393505 seconds
+    [ROOT] spent Send  : 0.000092 seconds
+    [ROOT] spent BaB   : 28.692492 seconds
+    [ROOT] spent Gather: 7.698929 seconds
+====================================================
+Start with City 2 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 19, 
+      | best_path: 2 15 1 11 6 16 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 267 
+    [ROOT] spent total : 17.164061 seconds
+    [ROOT] spent Send  : 0.000102 seconds
+    [ROOT] spent BaB   : 16.154048 seconds
+    [ROOT] spent Gather: 1.006576 seconds
+====================================================
+Start with City 3 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 0, 
+      | best_path: 3 13 14 8 5 10 12 4 7 2 15 1 11 6 16 0 9 
+      | best_path_cost: 286 
+    [ROOT] spent total : 46.649947 seconds
+    [ROOT] spent Send  : 0.000074 seconds
+    [ROOT] spent BaB   : 31.122653 seconds
+    [ROOT] spent Gather: 15.525708 seconds
+====================================================
+Start with City 4 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 46, 
+      | best_path: 4 12 10 5 8 14 13 3 0 9 16 7 2 15 1 6 11 
+      | best_path_cost: 290 
+    [ROOT] spent total : 31.189063 seconds
+    [ROOT] spent Send  : 0.000108 seconds
+    [ROOT] spent BaB   : 23.036235 seconds
+    [ROOT] spent Gather: 8.151127 seconds
+====================================================
+Start with City 5 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 49, 
+      | best_path: 5 8 10 12 4 7 2 15 1 11 6 16 9 0 3 13 14 
+      | best_path_cost: 291 
+    [ROOT] spent total : 34.385745 seconds
+    [ROOT] spent Send  : 0.000090 seconds
+    [ROOT] spent BaB   : 23.327356 seconds
+    [ROOT] spent Gather: 11.056753 seconds
+====================================================
+Start with City 6 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 24, 
+      | best_path: 6 11 2 15 1 16 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 283 
+    [ROOT] spent total : 53.140705 seconds
+    [ROOT] spent Send  : 0.000081 seconds
+    [ROOT] spent BaB   : 40.809077 seconds
+    [ROOT] spent Gather: 12.330274 seconds
+====================================================
+Start with City 7 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 6, 
+      | best_path: 7 4 12 10 5 8 14 13 3 0 9 16 6 11 1 15 2 
+      | best_path_cost: 285 
+    [ROOT] spent total : 20.830093 seconds
+    [ROOT] spent Send  : 0.000087 seconds
+    [ROOT] spent BaB   : 15.106610 seconds
+    [ROOT] spent Gather: 5.722038 seconds
+====================================================
+Start with City 8 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 19, 
+      | best_path: 8 5 10 12 4 7 2 15 1 11 6 16 9 0 3 13 14 
+      | best_path_cost: 287 
+    [ROOT] spent total : 31.139916 seconds
+    [ROOT] spent Send  : 0.000093 seconds
+    [ROOT] spent BaB   : 24.811489 seconds
+    [ROOT] spent Gather: 6.326395 seconds
+====================================================
+Start with City 9 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 2, 
+      | best_path: 9 0 3 13 14 8 5 10 12 4 7 2 15 1 16 6 11 
+      | best_path_cost: 260 
+    [ROOT] spent total : 25.713500 seconds
+    [ROOT] spent Send  : 0.000107 seconds
+    [ROOT] spent BaB   : 15.428420 seconds
+    [ROOT] spent Gather: 10.283311 seconds
+====================================================
+Start with City 10 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 18, 
+      | best_path: 10 5 8 14 13 3 0 9 16 7 4 12 2 15 1 6 11 
+      | best_path_cost: 290 
+    [ROOT] spent total : 27.223883 seconds
+    [ROOT] spent Send  : 0.000078 seconds
+    [ROOT] spent BaB   : 21.934744 seconds
+    [ROOT] spent Gather: 5.287033 seconds
+====================================================
+Start with City 11 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 40, 
+      | best_path: 11 6 16 1 15 2 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 260 
+    [ROOT] spent total : 18.135922 seconds
+    [ROOT] spent Send  : 0.000081 seconds
+    [ROOT] spent BaB   : 14.265629 seconds
+    [ROOT] spent Gather: 3.868273 seconds
+====================================================
+Start with City 12 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 2, 
+      | best_path: 12 4 7 16 6 11 1 15 2 10 5 8 14 13 3 0 9 
+      | best_path_cost: 293 
+    [ROOT] spent total : 27.123554 seconds
+    [ROOT] spent Send  : 0.000074 seconds
+    [ROOT] spent BaB   : 19.287767 seconds
+    [ROOT] spent Gather: 7.833399 seconds
+====================================================
+Start with City 13 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 6, 
+      | best_path: 13 14 3 0 9 16 7 4 5 8 10 12 2 15 1 6 11 
+      | best_path_cost: 291 
+    [ROOT] spent total : 48.552223 seconds
+    [ROOT] spent Send  : 0.000084 seconds
+    [ROOT] spent BaB   : 31.123300 seconds
+    [ROOT] spent Gather: 17.427445 seconds
+====================================================
+Start with City 14 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 6, 
+      | best_path: 14 13 3 0 9 16 7 4 5 8 10 12 2 15 1 6 11 
+      | best_path_cost: 282 
+    [ROOT] spent total : 45.789355 seconds
+    [ROOT] spent Send  : 0.000088 seconds
+    [ROOT] spent BaB   : 29.592644 seconds
+    [ROOT] spent Gather: 16.195327 seconds
+====================================================
+Start with City 15 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 16, 
+      | best_path: 15 1 2 7 4 12 10 5 8 14 13 3 0 9 16 6 11 
+      | best_path_cost: 284 
+    [ROOT] spent total : 31.321794 seconds
+    [ROOT] spent Send  : 0.000077 seconds
+    [ROOT] spent BaB   : 20.870049 seconds
+    [ROOT] spent Gather: 10.450213 seconds
+====================================================
+Start with City 16 
+    [ROOT] number of cities = 17 
+    [ROOT] number of processor = 64 
+    [ROOT] MODE_SEND = 0 (send Dist by Bcast) 
+ [ROOT] MODE_GATHER = 0 (gather by Allgather) 
+    [ROOT] best of the best is in rank 36, 
+      | best_path: 16 6 11 1 15 2 7 4 12 10 5 8 14 13 3 0 9 
+      | best_path_cost: 276 
+    [ROOT] spent total : 27.398839 seconds
+    [ROOT] spent Send  : 0.000066 seconds
+    [ROOT] spent BaB   : 17.476203 seconds
+    [ROOT] spent Gather: 9.921165 seconds
+best path cost = 260 | total time = 25.713500 s | path = 9 0 3 13 14 8 5 10 12 4 7 2 15 1 16 6 11 | RT = FALSE
