@@ -88,6 +88,18 @@ mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a0.out -i input/dist17
 mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a1.out -i input/dist17
 mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a0.out -i input/dist17
 mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a1.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a0.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a1.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a0.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a1.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a0.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a1.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a0.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a1.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a0.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a1.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a0.out -i input/dist17
+mpirun -machinefile $PBS_NODEFILE -np ${cpus} ./a1.out -i input/dist17
 
 ## Tidy up the log directory
 ## DO NOT CHANGE THE LINE BELOW
