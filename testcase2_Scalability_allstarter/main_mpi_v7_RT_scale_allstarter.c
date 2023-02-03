@@ -9,8 +9,8 @@
 #define INFINITE INT_MAX
 #define ROOT 0
 
-#define LOOP_1ST 0 ////set 1 to eneble loop all
-int START_CITIES=9; //start with 0 to n-1
+#define LOOP_1ST 1 ////set 1 to eneble loop all
+int START_CITIES=0; //start with 0 to n-1
 
 /* MODE_SEND 0 = send Dist by Bcast       | MODE_SEND 1 = send Dist by Ibcast
    MODE_SEND 2 = send Dist by Send & Recv | MODE_SEND 3 = send Dist by Isend & Irecv */
@@ -484,7 +484,7 @@ void save_result_csv(double index_time, int rank, char *dist_file, double total_
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
-    char* fileName="result_parallel_RT_size_compare.csv";
+    char* fileName="result_parallel_RT_scale_compare.csv";
     file = fopen(fileName, "r"); // open the file in "read" mode
     if (file == NULL) {
         file = fopen(fileName, "w"); //create new file in "write" mode

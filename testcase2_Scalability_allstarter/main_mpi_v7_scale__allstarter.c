@@ -9,8 +9,8 @@
 #define INFINITE INT_MAX
 #define ROOT 0
 
-#define LOOP_1ST 0 ////set 1 to eneble loop all
-int START_CITIES=9; //start with 0 to n-1
+#define LOOP_1ST 1 ////set 1 to eneble loop all
+int START_CITIES=0; //start with 0 to n-1
 
 /* MODE_SEND 0 = send Dist by Bcast       | MODE_SEND 1 = send Dist by Ibcast
    MODE_SEND 2 = send Dist by Send & Recv | MODE_SEND 3 = send Dist by Isend & Irecv */
@@ -39,20 +39,12 @@ double (*result)[NUM_RESULT];
 #define NUM_BRA_BOU 1 //set 1 to eneble print all
 double count_branch_bound;
 
-////////////////
-int all_best_bound;
-MPI_Request *global_request_Isend;
-MPI_Request *global_request_Irecv;
-int incoming_bound;
-int global_flag;
-///////////////
-
 void get_cities_info(char* file_path);
 void send_data_to_worker(int rank, int size);
 void do_wsp(int rank, int size);
 void path_initiation(int *path_i, int path_bound, int *visited_i, int level, int size);
 void level_initiation(int size);
-void branch_and_bound(int *path, int path_bound, int *visited, int level, int rank, int size);
+void branch_and_bound(int *path, int path_bound, int *visited, int level, int rank);
 void gather_result(int rank, int size);
 void save_result(int rank, int size, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, char* file_path);
 void save_result_csv(double index_time, int rank, char *dist_file, double total_computing_time, double sending_time, double BaB_computing_time, double gathering_time, double count_bab, double r_best_bound, double r_best_path);
@@ -183,7 +175,7 @@ int main(int argc, char *argv[]) {
     if(rank==ROOT){
         printf("best path bound = %d | total time = %f s | path = ", the_best_path_bound, time_of_the_best);
         for(int i=0; i<n; i++) printf("%d ", the_best_path[i]);
-        printf("| RT = TRUE");
+        printf("| RT = FALSE");
         printf("\n");
     }
     
@@ -303,19 +295,6 @@ void do_wsp(int rank, int size){
     init_path_rank=malloc(num_init_path * sizeof(int));
     path_initiation(path_i, 0, visited_i, 1, size);    
 
-    //////////////////////////////////////
-    all_best_bound = INFINITE;
-    global_request_Isend = malloc(size * sizeof(MPI_Request));
-    global_request_Irecv = malloc(size * sizeof(MPI_Request));
-    for(int i=0; i<size; i++){
-        if(i!=rank){
-            MPI_Isend(&all_best_bound, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Isend[i]);
-            MPI_Irecv(&incoming_bound, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv[i]);
-        }
-    }
-
-    //////////////////////////////////////
-
     //path and visit for branch_and_bound
     int *path = malloc(MAX_CITIES * sizeof(int));
     int *visited = malloc(MAX_CITIES * sizeof(int));
@@ -325,7 +304,7 @@ void do_wsp(int rank, int size){
                 path[j] = init_path[i][j];
                 visited[j] = init_visited[i][j];
             }
-            branch_and_bound(path, init_bound[i], visited, init_level, rank, size);        
+            branch_and_bound(path, init_bound[i], visited, init_level, rank);
         }
         
     }
@@ -334,9 +313,6 @@ void do_wsp(int rank, int size){
     free(visited_i);
     free(path);
     free(visited);
-    free(global_request_Irecv);
-    free(global_request_Isend);
-
 }
 
 void level_initiation(int size){
@@ -375,37 +351,12 @@ void path_initiation(int *path_i, int path_bound, int *visited_i, int level, int
     }
 }
 
-void branch_and_bound(int *path, int path_bound, int *visited, int level, int rank, int size) {
+void branch_and_bound(int *path, int path_bound, int *visited, int level, int rank) {
     if(NUM_BRA_BOU==1) count_branch_bound+=1;
     if (level == n) {
-        for(int i=0; i<size;i++){
-            if(i!=rank){
-                global_flag=0;
-                MPI_Test(&global_request_Irecv[i], &global_flag, MPI_STATUS_IGNORE);
-                if(global_flag){
-                    //printf("[GETT] %d << %d @ %d | %d", rank, i, incoming_bound, all_best_bound);
-                    if(incoming_bound < all_best_bound){
-                      //printf(" === SAVE\n");
-                      MPI_Cancel(&global_request_Isend[i]);
-                      all_best_bound = incoming_bound;
-                    }else{
-                      //printf("\n");
-                    }
-                    MPI_Irecv(&incoming_bound, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Irecv[i]);
-                }
-            }
-        }
-        if (path_bound < all_best_bound) {
+	    if (path_bound < best_path_bound[rank]) {
             best_path_bound[rank] = path_bound;
-            all_best_bound = path_bound;
-            for(int i = 0; i < n; i++) best_path[rank][i] = path[i]+1;
-            for(int i = 0; i < size; i++) {
-                if(i != rank) {
-                    MPI_Cancel(&global_request_Isend[i]);
-                    MPI_Isend(&all_best_bound, 1, MPI_INT, i, 2, MPI_COMM_WORLD, &global_request_Isend[i]);
-                    //printf("[SEND] %d @ %d >> %d\n", rank, path_bound, i);
-                }
-            }
+            for (int i = 0; i < n; i++) best_path[rank][i] = path[i]+1;
         }
     } else {
         for (int i = 0; i < n; i++) {
@@ -413,7 +364,7 @@ void branch_and_bound(int *path, int path_bound, int *visited, int level, int ra
                 path[level] = i;
                 visited[i] = 1;
                 int new_bound = path_bound + dist[i][path[level - 1]];
-            if (new_bound < all_best_bound) branch_and_bound(path, new_bound, visited, level + 1, rank, size);
+            if (new_bound < best_path_bound[rank]) branch_and_bound(path, new_bound, visited, level + 1, rank);
             visited[i] = 0;
 	        }
         }
@@ -429,7 +380,7 @@ void gather_result(int rank, int size){
 
     if(MODE_GATHER==0){
         // MODE_GATHER 0 = gather by Allgather
-        if(rank==ROOT) if(PRINT_ALL==1) printf("    [ROOT] MODE_GATHER = 0 (gather by Allgather) \n");
+        if(rank==ROOT) if(PRINT_ALL==1) printf("    ROOT] MODE_GATHER = 0 (gather by Allgather) \n");
         MPI_Allgather(&send_buf_bound, 1, MPI_INT, best_path_bound, 1, MPI_INT, MPI_COMM_WORLD);
         MPI_Allgather(&row_to_gather, MAX_CITIES, MPI_INT, best_path, MAX_CITIES, MPI_INT, MPI_COMM_WORLD);
     }else if(MODE_GATHER==1){
@@ -484,7 +435,7 @@ void save_result_csv(double index_time, int rank, char *dist_file, double total_
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
-    char* fileName="result_parallel_RT_size_compare.csv";
+    char* fileName="result_parallel_scale_compare.csv";
     file = fopen(fileName, "r"); // open the file in "read" mode
     if (file == NULL) {
         file = fopen(fileName, "w"); //create new file in "write" mode
